@@ -1,0 +1,74 @@
+name: stemxploref2
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.3.3
+  shared_preferences: ^2.2.0
+  flutter_slidable: ^3.1.0
+  provider: ^6.1.1
+  curved_navigation_bar: ^1.0.6
+  flutter_localization: ^0.3.3
+  youtube_player_flutter: ^9.1.1
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  generate: false
+  uses-material-design: true
+
+  assets:
+    - assets/images/Logo_F2.png
+    - assets/icons/1.png
+    - assets/icons/2.png
+    - assets/icons/3.png
+    - assets/icons/4.png
+    - assets/icons/5.png
+    - assets/icons/6.png
+    - assets/images/highlight1.webp
+    - assets/images/highlight2.png
+    - assets/images/highlight3.webp
+    - assets/images/highlight4.jpg
+    - assets/flag/language us_flag.png
+    - assets/flag/language ms_flag.png
+    - assets/images/STEM info.jpg
+    - assets/images/STEM 5.png
+    - assets/images/STEM 2.png
+    - assets/images/stemInfo3.png
+    - assets/images/steminfo4.png
+    - assets/images/science_book_cover.png
+    - assets/images/ask_book_cover.png
+    - assets/images/food_pyramid_image.webp
+    - assets/images/math_book_cover.png
+    - assets/images/rbt_book_cover.png
+    - assets/images/Science.png
+    - assets/images/quiz_stem.png
+    - assets/images/quiz_explanation.png
+    - assets/images/rafal.jpg
+    - assets/images/Gitanjali.jpg
+    - assets/images/brooke.jpg
+    - assets/images/STEM_video1.png
+    - assets/images/nutrition.png
+    - assets/images/biodiversity.png
+    - assets/images/ecosystem.png
+    - assets/images/info1.png
+    - assets/images/info2.png
+    - assets/images/info3.png
+    - assets/images/info4.png
+    - assets/images/Logo_Kedah.png
+    - assets/images/Logo_UUM.png
+
+
