@@ -5,14 +5,22 @@ import 'package:flutter_localization/flutter_localization.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 
-class FaqPage extends StatelessWidget {
+class FaqPage extends StatefulWidget {
   static const routeName = '/faq';
   const FaqPage({super.key});
 
   @override
+  State<FaqPage> createState() => _FaqPageState();
+}
+
+class _FaqPageState extends State<FaqPage> {
+  @override
   Widget build(BuildContext context) {
     final FlutterLocalization localization = FlutterLocalization.instance;
     final bool isEnglish = localization.currentLocale?.languageCode == 'en';
+    final String title = isEnglish
+        ? 'Frequent Asked Questions'
+        : 'Soalan Lazim';
 
     // FAQ Data
     final List<Map<String, String>> faqData = isEnglish
@@ -125,84 +133,14 @@ class FaqPage extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              AppBar(
-                automaticallyImplyLeading: false,
-                centerTitle: true,
-                backgroundColor: Colors.transparent,
-                scrolledUnderElevation: 0,
-                elevation: 0,
-                title: Text(
-                  isEnglish ? 'Frequent Asked Questions' : 'Soalan Lazim',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 22,
-                  ),
-                ),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: PopupMenuButton<String>(
-                      color: Color.fromARGB(255, 236, 233, 233),
-                      icon: Image.asset(
-                        isEnglish
-                            ? 'assets/flag/language us_flag.png'
-                            : 'assets/flag/language ms_flag.png',
-                        width: 40,
-                      ),
-                      offset: const Offset(0, 50),
-                      onSelected: (String value) {
-                        localization.translate(value);
-                      },
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
-                            PopupMenuItem<String>(
-                              value: 'en',
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    'English (Default)',
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                  if (isEnglish) const Spacer(),
-                                  if (isEnglish)
-                                    const Icon(
-                                      Icons.check_circle,
-                                      size: 20,
-                                      color: Colors.green,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem<String>(
-                              value: 'ms',
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    'Malay',
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                  if (!isEnglish) const Spacer(),
-                                  if (!isEnglish)
-                                    const Icon(
-                                      Icons.check_circle,
-                                      size: 20,
-                                      color: Colors.green,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                    ),
-                  ),
-                ],
-              ),
+              // Updated integrated AppBar and Flag Toggle
+              _buildCustomAppBar(title, isEnglish, localization),
 
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 8,
+                    vertical: 20,
                   ),
                   itemCount: faqData.length,
                   itemBuilder: (context, index) {
@@ -229,12 +167,96 @@ class FaqPage extends StatelessWidget {
       ),
     );
   }
+
+  // Same AppBar logic as InfoPage for UI consistency
+  Widget _buildCustomAppBar(
+    String title,
+    bool isEnglish,
+    FlutterLocalization localization,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(width: 50),
+          Expanded(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          PopupMenuButton<String>(
+            elevation: 2,
+            position: PopupMenuPosition.under,
+            icon: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black, width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  key: ValueKey<bool>(isEnglish),
+                  isEnglish
+                      ? 'assets/flag/language us_flag.png'
+                      : 'assets/flag/language ms_flag.png',
+                  width: 36,
+                  height: 36,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            onSelected: (value) {
+              setState(() {
+                localization.translate(value);
+              });
+            },
+            itemBuilder: (context) => [
+              _buildPopupMenuItem('en', 'English (Default)', isEnglish),
+              _buildPopupMenuItem('ms', 'Malay', !isEnglish),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _buildPopupMenuItem(
+    String value,
+    String text,
+    bool isSelected,
+  ) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        children: [
+          Text(text, style: const TextStyle(fontSize: 14)),
+          if (isSelected) ...[
+            const Spacer(),
+            const Icon(Icons.check_circle, color: Colors.green, size: 20),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
+// Design for FAQ Items remains exactly as you had it
 class FaqItem extends StatefulWidget {
   final String question;
   final String answer;
-
   const FaqItem({super.key, required this.question, required this.answer});
 
   @override
@@ -257,6 +279,13 @@ class _FaqItemState extends State<FaqItem> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -270,26 +299,21 @@ class _FaqItemState extends State<FaqItem> {
                     isExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: Color.fromARGB(255, 255, 255, 224),
+                    color: const Color.fromARGB(255, 255, 0, 0),
                   ),
                 ],
               ),
             ),
           ),
-          if (isExpanded) const SizedBox(height: 10),
-
-          // ANSWER BOX
-          if (isExpanded)
+          if (isExpanded) ...[
+            const SizedBox(height: 12),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 252, 196, 74),
+                color: const Color.fromARGB(255, 255, 210, 102), //soft yellow
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: const Color.fromARGB(218, 0, 0, 0),
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.black, width: 1),
               ),
               child: Text(
                 widget.answer,
@@ -301,6 +325,7 @@ class _FaqItemState extends State<FaqItem> {
                 ),
               ),
             ),
+          ],
         ],
       ),
     );

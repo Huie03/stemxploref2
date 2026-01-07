@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:stemxploref2/widgets/solid_background.dart';
 
 class BookmarkPage extends StatefulWidget {
   static const String routeName = '/bookmark';
@@ -12,24 +12,34 @@ class BookmarkPage extends StatefulWidget {
 }
 
 class _BookmarkPageState extends State<BookmarkPage> {
-  List<Map<String, String>> bookmarks = [
+  final List<Map<String, String>> _bookmarks = [
     {"title": "Science", "chapter": "Chapter 3"},
     {"title": "Science", "chapter": "Chapter 2"},
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // This tells the page: "Whenever the global language changes, rebuild yourself"
+    FlutterLocalization.instance.onTranslatedLanguage = (_) {
+      if (mounted) setState(() {});
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
     final FlutterLocalization localization = FlutterLocalization.instance;
-    final bool isEnglish = localization.currentLocale?.languageCode == 'en';
+    // Handle null safety for currentLocale
+    final Locale? currentLocale = localization.currentLocale;
+    final bool isEnglish =
+        currentLocale?.languageCode == 'en' || currentLocale == null;
     final String title = isEnglish ? "Bookmark" : "Penanda Buku";
 
     return Scaffold(
-      // Removed AppBar property to use the custom widget inside body
       body: SolidBackground(
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Unified AppBar style from InfoPage
               _buildCustomAppBar(title, isEnglish, localization),
               Expanded(
                 child: Column(
@@ -52,22 +62,19 @@ class _BookmarkPageState extends State<BookmarkPage> {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: bookmarks.length,
+                        itemCount: _bookmarks.length,
                         itemBuilder: (context, index) {
-                          final String rawTitle = bookmarks[index]["title"]!;
+                          final String rawTitle = _bookmarks[index]["title"]!;
                           final String rawChapter =
-                              bookmarks[index]["chapter"]!;
+                              _bookmarks[index]["chapter"]!;
 
-                          String displayTitle = rawTitle;
-                          String displayChapter = rawChapter;
-
-                          if (!isEnglish) {
-                            if (rawTitle == "Science") displayTitle = "Sains";
-                            displayChapter = rawChapter.replaceAll(
-                              "Chapter",
-                              "Bab",
-                            );
-                          }
+                          String displayTitle =
+                              (rawTitle == "Science" && !isEnglish)
+                              ? "Sains"
+                              : rawTitle;
+                          String displayChapter = isEnglish
+                              ? rawChapter
+                              : rawChapter.replaceAll("Chapter", "Bab");
 
                           return _buildSlidableCard(
                             index,
@@ -80,9 +87,11 @@ class _BookmarkPageState extends State<BookmarkPage> {
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Divider(thickness: 1.5, color: Colors.black),
+              const Divider(
+                thickness: 1,
+                height: 20,
+                indent: 12,
+                endIndent: 12,
               ),
               _buildCareerResult(isEnglish),
               const SizedBox(height: 80),
@@ -93,7 +102,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
     );
   }
 
-  // Identical AppBar builder from InfoPage
   Widget _buildCustomAppBar(
     String title,
     bool isEnglish,
@@ -104,7 +112,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const SizedBox(width: 50), // Balances the UI
+          const SizedBox(width: 50),
           Text(
             title,
             style: const TextStyle(
@@ -122,7 +130,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
                 border: Border.all(color: Colors.black, width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withValues(alpha: 0.2), // Updated
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
@@ -155,18 +163,37 @@ class _BookmarkPageState extends State<BookmarkPage> {
     );
   }
 
-  // Slidable card helper
+  PopupMenuItem<String> _buildPopupMenuItem(
+    String value,
+    String text,
+    bool isSelected,
+  ) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        children: [
+          Text(text, style: const TextStyle(fontSize: 14)),
+          if (isSelected) ...[
+            const Spacer(),
+            const Icon(Icons.check_circle, color: Colors.green, size: 20),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildSlidableCard(int index, String title, String chapter) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Slidable(
-        key: ValueKey(bookmarks[index]),
+        key: ValueKey(_bookmarks[index]),
         endActionPane: ActionPane(
           motion: const DrawerMotion(),
           extentRatio: 0.25,
           children: [
             SlidableAction(
-              onPressed: (context) => setState(() => bookmarks.removeAt(index)),
+              onPressed: (context) =>
+                  setState(() => _bookmarks.removeAt(index)),
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               icon: Icons.delete,
@@ -183,7 +210,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
+                color: Colors.black.withValues(alpha: 0.35), // Updated
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -212,27 +239,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
     );
   }
 
-  // Popup Item Builder (Updated to match InfoPage font size)
-  PopupMenuItem<String> _buildPopupMenuItem(
-    String value,
-    String text,
-    bool isSelected,
-  ) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          // Using fontSize 14 to match InfoPage exactly
-          Text(text, style: const TextStyle(fontSize: 14)),
-          if (isSelected) ...[
-            const Spacer(),
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          ],
-        ],
-      ),
-    );
-  }
-
   Widget _buildCareerResult(bool isEnglish) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -243,11 +249,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
             isEnglish
                 ? "Interest–career matching result:"
                 : "Keputusan padanan minat-kerjaya:",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 17,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
           ),
           const SizedBox(height: 12),
           Container(
@@ -255,11 +257,10 @@ class _BookmarkPageState extends State<BookmarkPage> {
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.white,
-
               borderRadius: BorderRadius.circular(35),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: Colors.black.withValues(alpha: 0.2), // Updated
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),

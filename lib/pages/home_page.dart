@@ -45,8 +45,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Add this listener
+    FlutterLocalization.instance.onTranslatedLanguage = _onLanguageChanged;
+  }
+
+  // This function will be called whenever translate() is called anywhere in the app
+  void _onLanguageChanged(Locale? locale) {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
+    FlutterLocalization.instance.onTranslatedLanguage = null;
     super.dispose();
   }
 
@@ -71,27 +86,40 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final FlutterLocalization localization = FlutterLocalization.instance;
+
+    // This line is the secret: it ensures the widget rebuilds when language changes
+    // if you are using the standard flutter_localization setup.
     final String currentLang = localization.currentLocale?.languageCode ?? 'en';
     final bool isEnglish = currentLang == 'en';
 
+    // Helper to get text from your existing map logic,
+    // but we ensure it's called during build.
+    String translate(String key) {
+      final Map<String, Map<String, String>> localizedValues = {
+        'stemInfo': {'en': 'STEM Info', 'ms': 'Info STEM'},
+        'learning': {'en': 'Learning Material', 'ms': 'Bahan Pembelajaran'},
+        'quiz': {'en': 'Quiz Game', 'ms': 'Permainan Kuiz'},
+        'careers': {'en': 'STEM Careers', 'ms': 'Kerjaya STEM'},
+        'challenge': {'en': 'Daily Challenge', 'ms': 'Cabaran Harian'},
+        'faq': {'en': 'FAQ', 'ms': 'Soalan Lazim'},
+        'highlights': {'en': 'STEM Highlights:', 'ms': 'Sorotan STEM:'},
+        'readMore': {'en': 'Read more', 'ms': 'Baca lagi'},
+      };
+      return localizedValues[key]?[isEnglish ? 'en' : 'ms'] ?? key;
+    }
+
     return Scaffold(
-      // Setting physics to NeverScrollableScrollPhysics at the Scaffold level
-      // is not enough, we must remove the scroll widgets entirely.
       body: SolidBackground(
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Fixed Top Bar
               _buildTopBar(isEnglish, localization),
-
-              // 2. Main Content Area (Fixed Height)
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
                     left: 12,
                     right: 12,
-                    top: 0, // Changed from vertical: 8 to 0
-                    bottom: 8, // Keep some bottom padding for the highlights
+                    bottom: 8,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -109,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                               const NeverScrollableScrollPhysics(), // Disables internal scroll
                           children: [
                             _FeatureButton(
-                              label: _getTranslatedText('stemInfo', isEnglish),
+                              label: translate('stemInfo'), // Use the helper
                               icon: Icons.science,
                               imageAsset: 'assets/icons/1.png',
                               onTap: () => Navigator.of(
@@ -117,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                               ).pushNamed(StemInfoPage.routeName),
                             ),
                             _FeatureButton(
-                              label: _getTranslatedText('learning', isEnglish),
+                              label: translate('learning'),
                               icon: Icons.menu_book,
                               imageAsset: 'assets/icons/2.png',
                               onTap: () => Navigator.of(
@@ -125,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                               ).pushNamed(LearningMaterialPage.routeName),
                             ),
                             _FeatureButton(
-                              label: _getTranslatedText('quiz', isEnglish),
+                              label: translate('quiz'),
                               icon: Icons.videogame_asset,
                               imageAsset: 'assets/icons/3.png',
                               onTap: () => Navigator.of(
@@ -133,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                               ).pushNamed(QuizGamePage.routeName),
                             ),
                             _FeatureButton(
-                              label: _getTranslatedText('careers', isEnglish),
+                              label: translate('careers'),
                               icon: Icons.work,
                               imageAsset: 'assets/icons/4.png',
                               onTap: () => Navigator.of(
@@ -141,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                               ).pushNamed(StemCareersPage.routeName),
                             ),
                             _FeatureButton(
-                              label: _getTranslatedText('challenge', isEnglish),
+                              label: translate('challenge'),
                               icon: Icons.calendar_today,
                               imageAsset: 'assets/icons/5.png',
                               onTap: () => Navigator.of(
@@ -149,7 +177,7 @@ class _HomePageState extends State<HomePage> {
                               ).pushNamed(DailyChallengePage.routeName),
                             ),
                             _FeatureButton(
-                              label: _getTranslatedText('faq', isEnglish),
+                              label: translate('faq'),
                               icon: Icons.help_outline,
                               imageAsset: 'assets/icons/6.png',
                               onTap: () => Navigator.of(
@@ -159,10 +187,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                       ),
-
                       const Divider(thickness: 1, height: 20),
-
-                      // HIGHLIGHTS SECTION
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -172,11 +197,11 @@ class _HomePageState extends State<HomePage> {
                               bottom: 8.0,
                             ),
                             child: Text(
-                              _getTranslatedText('highlights', isEnglish),
+                              translate('highlights'), // Use the helper
                               style: const TextStyle(
                                 color: Colors.black87,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 18, // Slightly reduced to save space
+                                fontSize: 18,
                               ),
                             ),
                           ),

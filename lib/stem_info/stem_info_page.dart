@@ -6,14 +6,20 @@ import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
-class StemInfoPage extends StatelessWidget {
+class StemInfoPage extends StatefulWidget {
   static const routeName = '/stem-info';
 
   const StemInfoPage({super.key});
 
   @override
+  State<StemInfoPage> createState() => _StemInfoPageState();
+}
+
+class _StemInfoPageState extends State<StemInfoPage> {
+  @override
   Widget build(BuildContext context) {
     final FlutterLocalization localization = FlutterLocalization.instance;
+    // This variable now refreshes whenever setState is called
     final bool isEnglish = localization.currentLocale?.languageCode == 'en';
 
     final List<Map<String, String>> stemData = isEnglish
@@ -21,9 +27,12 @@ class StemInfoPage extends StatelessWidget {
             {
               'title': 'Watch: What is STEM?',
               'preview':
-                  'Learn what STEM means and how Science, Technology, Engineering, and Math work together. See simple examples of how STEM is used in real life.',
-              'videoUrl': 'https://www.youtube.com/watch?v=F4Ya-etTbV0',
-              'previewImage': 'assets/images/STEM_video1.png',
+                  'Learn what STEM means and how Science, Technology, Engineering, and Math work together. '
+                  'See simple examples of how STEM is used in real life.\n\n'
+                  'This video also shows how students can apply STEM concepts in everyday activities and projects, '
+                  'making learning fun and interactive.',
+              'videoUrl': 'https://youtu.be/wRV28EOCGGo?si=i7nfreNgNU1jF1J8',
+              'previewImage': 'assets/images/STEMvideo1.png',
             },
             {
               'title': 'Applied STEM in real life',
@@ -54,9 +63,12 @@ class StemInfoPage extends StatelessWidget {
             {
               'title': 'Tonton: Apakah itu STEM?',
               'preview':
-                  'Ketahui maksud STEM dan bagaimana Sains, Teknologi, Kejuruteraan, dan Matematik bekerjasama. Lihat contoh mudah penggunaan STEM dalam kehidupan seharian.',
-              'videoUrl': 'https://www.youtube.com/watch?v=F4Ya-etTbV0',
-              'previewImage': 'assets/images/STEM_video1.png',
+                  'Ketahui maksud STEM dan bagaimana Sains, Teknologi, Kejuruteraan, dan Matematik berfungsi bersama. '
+                  'Lihat contoh mudah bagaimana STEM digunakan dalam kehidupan sebenar.\n\n'
+                  'Video ini juga menunjukkan bagaimana pelajar boleh menggunakan konsep STEM dalam aktiviti dan projek harian, '
+                  'membuat pembelajaran menjadi menyeronokkan dan interaktif.',
+              'videoUrl': 'https://youtu.be/wRV28EOCGGo?si=i7nfreNgNU1jF1J8',
+              'previewImage': 'assets/images/STEMvideo1.png',
             },
             {
               'title': 'Aplikasi STEM dalam kehidupan',
@@ -91,13 +103,12 @@ class StemInfoPage extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              // --- UPDATED APP BAR TO MATCH INFO PAGE ---
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 50), // Balance the flag button
+                    const SizedBox(width: 50),
                     Text(
                       title,
                       style: const TextStyle(
@@ -134,7 +145,10 @@ class StemInfoPage extends StatelessWidget {
                         ),
                       ),
                       onSelected: (value) {
-                        localization.translate(value);
+                        // CRITICAL: Call setState so the UI rebuilds with the new language
+                        setState(() {
+                          localization.translate(value);
+                        });
                       },
                       itemBuilder: (context) => [
                         _buildPopupMenuItem(
@@ -148,8 +162,6 @@ class StemInfoPage extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // --- END OF UPDATED APP BAR ---
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(
@@ -173,7 +185,7 @@ class StemInfoPage extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
@@ -224,14 +236,14 @@ class StemInfoPage extends StatelessWidget {
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F1E9),
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
                                   border: Border.all(color: Colors.black12),
                                 ),
                                 child: Text(
                                   item['preview']!,
                                   style: const TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     height: 1.4,
                                   ),
@@ -261,7 +273,6 @@ class StemInfoPage extends StatelessWidget {
     );
   }
 
-  // Helper method to build the popup menu items exactly like InfoPage
   PopupMenuItem<String> _buildPopupMenuItem(
     String value,
     String text,

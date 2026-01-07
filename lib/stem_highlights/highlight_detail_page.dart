@@ -6,11 +6,16 @@ import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
-class HighlightDetailPage extends StatelessWidget {
+class HighlightDetailPage extends StatefulWidget {
   static const routeName = '/highlight-detail';
   final Highlight highlight;
   const HighlightDetailPage({super.key, required this.highlight});
 
+  @override
+  State<HighlightDetailPage> createState() => _HighlightDetailPageState();
+}
+
+class _HighlightDetailPageState extends State<HighlightDetailPage> {
   @override
   Widget build(BuildContext context) {
     final FlutterLocalization localization = FlutterLocalization.instance;
@@ -18,10 +23,12 @@ class HighlightDetailPage extends StatelessWidget {
     final String currentLang = localization.currentLocale?.languageCode ?? 'en';
     final bool isEnglish = currentLang == 'en';
 
-    final String displayTitle = isEnglish ? highlight.title : highlight.titleMs;
+    final String displayTitle = isEnglish
+        ? widget.highlight.title
+        : widget.highlight.titleMs;
     final Map<String, List<String>> displayDetails = isEnglish
-        ? highlight.details
-        : highlight.detailsMs;
+        ? widget.highlight.details
+        : widget.highlight.detailsMs;
     final String appBarTitle = isEnglish ? 'STEM Highlights' : 'Sorotan STEM';
 
     return Scaffold(
@@ -29,96 +36,85 @@ class HighlightDetailPage extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              AppBar(
-                title: Text(
-                  appBarTitle,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                centerTitle: true,
-                automaticallyImplyLeading: false,
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: PopupMenuButton<String>(
-                      color: const Color.fromARGB(255, 236, 233, 233),
-                      icon: Image.asset(
-                        isEnglish
-                            ? 'assets/flag/language us_flag.png'
-                            : 'assets/flag/language ms_flag.png',
-                        width: 40,
+              // --- ADJUSTED APP BAR TO MATCH INFO PAGE ---
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 50), // Balance the flag button
+                    Text(
+                      appBarTitle,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: Colors.black,
                       ),
-                      offset: const Offset(0, 50),
-                      onSelected: (String value) {
-                        localization.translate(value);
+                    ),
+                    PopupMenuButton<String>(
+                      elevation: 2,
+                      position: PopupMenuPosition.under,
+                      icon: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black, width: 1),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            key: ValueKey<bool>(isEnglish),
+                            isEnglish
+                                ? 'assets/flag/language us_flag.png'
+                                : 'assets/flag/language ms_flag.png',
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      onSelected: (value) {
+                        setState(() {
+                          localization.translate(value);
+                        });
                       },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
-                          value: 'en',
-                          child: Row(
-                            children: [
-                              const Text(
-                                'English (Default)',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              if (isEnglish) ...[
-                                const Spacer(),
-                                const Icon(
-                                  Icons.check_circle,
-                                  size: 20,
-                                  color: Colors.green,
-                                ),
-                              ],
-                            ],
-                          ),
+                      itemBuilder: (context) => [
+                        _buildPopupMenuItem(
+                          'en',
+                          'English (Default)',
+                          isEnglish,
                         ),
-                        PopupMenuItem<String>(
-                          value: 'ms',
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Malay',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              if (!isEnglish) ...[
-                                const Spacer(),
-                                const Icon(
-                                  Icons.check_circle,
-                                  size: 20,
-                                  color: Colors.green,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+                        _buildPopupMenuItem('ms', 'Malay', !isEnglish),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+
+              // --- END OF ADJUSTED APP BAR ---
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     children: [
                       Text(
                         displayTitle,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 3),
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: Colors.black, width: 1),
                         ),
@@ -128,7 +124,7 @@ class HighlightDetailPage extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(15),
                               child: Image.asset(
-                                highlight.image,
+                                widget.highlight.image,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -211,6 +207,26 @@ class HighlightDetailPage extends StatelessWidget {
           ).setIndex(index);
           Navigator.of(context).popUntil((route) => route.isFirst);
         },
+      ),
+    );
+  }
+
+  // Helper to match the InfoPage menu items
+  PopupMenuItem<String> _buildPopupMenuItem(
+    String value,
+    String text,
+    bool isSelected,
+  ) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        children: [
+          Text(text, style: const TextStyle(fontSize: 14)),
+          if (isSelected) ...[
+            const Spacer(),
+            const Icon(Icons.check_circle, color: Colors.green, size: 20),
+          ],
+        ],
       ),
     );
   }

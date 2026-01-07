@@ -9,8 +9,8 @@ class SolidBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        // Solid color
-        color: Color.fromARGB(255, 255, 255, 224),
+        // Light yellow
+        color: Color(0xFFFFFFE0),
       ),
       child: child,
     );

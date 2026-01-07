@@ -193,12 +193,30 @@ class _StemDetailPageState extends State<StemDetailPage> {
                             if (item['preview'] != null &&
                                 item['preview']!.isNotEmpty)
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
+                                padding: const EdgeInsets.only(
+                                  bottom: 0,
+                                ), // Removed bottom padding here to use SizedBox for control
                                 child: Text(
                                   item['preview']!,
                                   textAlign: TextAlign.justify,
+                                  style: const TextStyle(
+                                    fontSize:
+                                        15, // <--- Add your desired font size here
+                                    color: Colors
+                                        .black87, // Optional: makes it slightly softer than pure black
+                                    height:
+                                        1.5, // Optional: improves readability with line spacing
+                                  ),
                                 ),
                               ),
+
+                            // --- ADDED SPACE HERE ---
+                            if (item['preview'] != null &&
+                                item['preview']!.isNotEmpty)
+                              const SizedBox(
+                                height: 50,
+                              ), // Adjust this value (20) to your liking
+                            // ------------------------
                             ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child:
@@ -212,10 +230,52 @@ class _StemDetailPageState extends State<StemDetailPage> {
                                                   const Icon(
                                                     Icons.image,
                                                     size: 100,
-                                                    color: Colors.grey,
+                                                    color: Colors.white,
                                                   ),
                                         )),
                             ),
+                            // --- ADDED SOURCE TEXT AND SPACING BELOW ---
+                            if (widget.itemIndex == 0) ...[
+                              const SizedBox(
+                                height: 15,
+                              ), // Space above the text
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontSize:
+                                          12, // Slightly smaller to look like a caption
+                                      color: Colors.black,
+                                      height: 1.4,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text: "Source:\n",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            "What is STEM? – STEM Best Practice, 20 June 2017\n",
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            "https://www.youtube.com/watch?v=wRV28EOCGGo",
+                                        style: TextStyle(
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ), // Extra space below the source
+                            ],
+                            // ------------------------------------------
                           ],
                         ),
                       ),
@@ -265,8 +325,11 @@ class _StemDetailPageState extends State<StemDetailPage> {
     {
       'title': 'Watch: What is STEM?',
       'preview':
-          'Learn what STEM means and how Science, Technology, Engineering, and Math work together. See simple examples of how STEM is used in real life.',
-      'videoUrl': 'https://www.youtube.com/watch?v=F4Ya-etTbV0',
+          'Learn what STEM means and how Science, Technology, Engineering, and Math work together. '
+          'See simple examples of how STEM is used in real life.\n\n'
+          'This video also shows how students can apply STEM concepts in everyday activities and projects, '
+          'making learning fun and interactive.',
+      'videoUrl': 'https://youtu.be/wRV28EOCGGo?si=i7nfreNgNU1jF1J8',
     },
     {
       'title': 'Applied STEM in real life',
@@ -295,8 +358,11 @@ class _StemDetailPageState extends State<StemDetailPage> {
     {
       'title': 'Tonton: Apakah itu STEM?',
       'preview':
-          'Ketahui maksud STEM dan bagaimana Sains, Teknologi, Kejuruteraan, dan Matematik bekerjasama. Lihat contoh mudah penggunaan STEM dalam kehidupan seharian.',
-      'videoUrl': 'https://www.youtube.com/watch?v=F4Ya-etTbV0',
+          'Ketahui maksud STEM dan bagaimana Sains, Teknologi, Kejuruteraan, dan Matematik berfungsi bersama. '
+          'Lihat contoh mudah bagaimana STEM digunakan dalam kehidupan sebenar.\n\n'
+          'Video ini juga menunjukkan bagaimana pelajar boleh menggunakan konsep STEM dalam aktiviti dan projek harian, '
+          'membuat pembelajaran menjadi menyeronokkan dan interaktif.',
+      'videoUrl': 'https://youtu.be/wRV28EOCGGo?si=i7nfreNgNU1jF1J8',
     },
     {
       'title': 'Aplikasi STEM dalam kehidupan',
@@ -388,7 +454,7 @@ class AppliedStemLayout extends StatelessWidget {
           Text(
             desc,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 15,
               height: 1.3,
               color: Colors.black,
             ),
@@ -411,7 +477,7 @@ class AppliedStemLayout extends StatelessWidget {
                             height: 80,
                             child: const Icon(
                               Icons.image_not_supported,
-                              color: Colors.grey,
+                              color: Colors.white,
                             ),
                           ),
                         ),

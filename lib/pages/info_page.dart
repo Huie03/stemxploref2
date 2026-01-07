@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:stemxploref2/widgets/solid_background.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
-import '/navigation_provider.dart';
+import 'package:stemxploref2/navigation_provider.dart';
 
 class InfoPage extends StatefulWidget {
   static const routeName = '/info';
@@ -15,9 +15,32 @@ class InfoPage extends StatefulWidget {
 
 class _InfoPageState extends State<InfoPage> {
   @override
+  void initState() {
+    super.initState();
+    // Add this listener
+    FlutterLocalization.instance.onTranslatedLanguage = _onLanguageChanged;
+  }
+
+  // This function will be called whenever translate() is called anywhere in the app
+  void _onLanguageChanged(Locale? locale) {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    // Clean up listener
+    FlutterLocalization.instance.onTranslatedLanguage = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final FlutterLocalization localization = FlutterLocalization.instance;
-    final bool isEnglish = localization.currentLocale?.languageCode == 'en';
+    final bool isEnglish =
+        localization.currentLocale?.languageCode == 'en' ||
+        localization.currentLocale == null;
 
     final String title = isEnglish ? 'Info' : 'Maklumat';
 
@@ -37,14 +60,12 @@ class _InfoPageState extends State<InfoPage> {
                   child: Column(
                     children: [
                       const SizedBox(height: 10),
-                      // Main Illustration Logo
                       Image.asset(
                         'assets/images/Logo_F2.png',
                         height: 200,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 8),
-                      // Justified Description
                       Text(
                         description,
                         textAlign: TextAlign.justify,
@@ -56,7 +77,6 @@ class _InfoPageState extends State<InfoPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Footer Logos (Kedah and UUM)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -64,8 +84,7 @@ class _InfoPageState extends State<InfoPage> {
                             'assets/images/Logo_Kedah.png',
                             width: 100,
                             height: 100,
-                            fit: BoxFit
-                                .contain, // Ensures the logo doesn't stretch
+                            fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 30),
                           Image.asset(
@@ -108,7 +127,7 @@ class _InfoPageState extends State<InfoPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const SizedBox(width: 50),
+          const SizedBox(width: 50), // Balance for centering title
           Text(
             title,
             style: const TextStyle(
@@ -117,12 +136,14 @@ class _InfoPageState extends State<InfoPage> {
               color: Colors.black,
             ),
           ),
+          // Flag Toggle: Matching HomePage shadow and behavior
           PopupMenuButton<String>(
             elevation: 2,
             position: PopupMenuPosition.under,
             icon: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                color: Colors.white,
                 border: Border.all(color: Colors.black, width: 1),
                 boxShadow: [
                   BoxShadow(
@@ -134,7 +155,6 @@ class _InfoPageState extends State<InfoPage> {
               ),
               child: ClipOval(
                 child: Image.asset(
-                  // The Key forces the flag to redraw when the language changes
                   key: ValueKey<bool>(isEnglish),
                   isEnglish
                       ? 'assets/flag/language us_flag.png'
@@ -169,11 +189,10 @@ class _InfoPageState extends State<InfoPage> {
       value: value,
       child: Row(
         children: [
-          Text(text, style: const TextStyle(fontSize: 14)),
-          if (isSelected) ...[
-            const Spacer(),
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          ],
+          Text(text, style: const TextStyle(fontSize: 15)),
+          if (isSelected) const Spacer(),
+          if (isSelected)
+            const Icon(Icons.check_circle, size: 20, color: Colors.green),
         ],
       ),
     );

@@ -40,27 +40,41 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
       titleEn: 'Nutrition',
       titleMs: 'Nutrisi',
       factEn:
-          'Carbohydrates are the main source of energy for our body and help us stay active.',
+          'Carbohydrates are the main source of energy for our body and help us stay active. '
+          'Foods like rice, bread, and fruits contain carbohydrates. '
+          'Eating a balanced diet helps our body grow strong and stay healthy.',
+
       factMs:
-          'Karbohidrat adalah sumber tenaga utama bagi tubuh kita dan membantu kita kekal aktif.',
+          'Karbohidrat adalah sumber tenaga utama bagi tubuh kita dan membantu kita kekal aktif. '
+          'Makanan seperti nasi, roti dan buah-buahan mengandungi karbohidrat. '
+          'Pengambilan makanan seimbang membantu tubuh kita membesar dengan sihat dan kuat.',
       imagePath: 'assets/images/nutrition.png',
     ),
     Challenge(
       titleEn: 'Biodiversity',
       titleMs: 'Kepelbagaian Biologi',
       factEn:
-          'Biodiversity refers to the variety of living organisms, such as plants and animals, in a habitat and helps keep ecosystems stable.',
+          'Biodiversity refers to the variety of living organisms, such as plants and animals, in a habitat and helps keep ecosystems stable. '
+          'Forests with many different species are usually healthier. '
+          'Protecting biodiversity helps ensure food, clean air, and clean water for humans.',
       factMs:
-          'Kepelbagaian biologi merujuk kepada kepelbagaian organisma hidup seperti tumbuhan dan haiwan dalam sesuatu habitat dan membantu mengekalkan kestabilan ekosistem.',
+          'Kepelbagaian biologi merujuk kepada kepelbagaian organisma hidup seperti tumbuhan dan haiwan dalam sesuatu habitat dan membantu mengekalkan kestabilan ekosistem. '
+          'Hutan yang mempunyai pelbagai spesies biasanya lebih sihat. '
+          'Melindungi kepelbagaian biologi membantu memastikan bekalan makanan, udara bersih dan air bersih untuk manusia.',
       imagePath: 'assets/images/biodiversity.png',
     ),
     Challenge(
       titleEn: 'Ecosystem',
       titleMs: 'Ekosistem',
       factEn:
-          'An ecosystem is a community of living organisms interacting with each other and with non-living components like water, air, and soil.',
+          'An ecosystem is a community of living organisms interacting with each other and with non-living components like water, air, and soil. '
+          'Examples of ecosystems include forests, rivers, and oceans. '
+          'If one part of an ecosystem is damaged, it can affect all living things in that area.',
+
       factMs:
-          'Ekosistem ialah komuniti organisma hidup yang berinteraksi antara satu sama lain dan dengan komponen bukan hidup seperti air, udara dan tanah.',
+          'Ekosistem ialah komuniti organisma hidup yang berinteraksi antara satu sama lain dan dengan komponen bukan hidup seperti air, udara dan tanah. '
+          'Contoh ekosistem termasuk hutan, sungai dan lautan. '
+          'Jika satu bahagian ekosistem rosak, ia boleh memberi kesan kepada semua hidupan di kawasan tersebut.',
       imagePath: 'assets/images/ecosystem.png',
     ),
   ];
@@ -178,7 +192,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                           child: Column(
                             children: [
                               const SizedBox(
-                                height: 35,
+                                height: 25,
                               ), // MOVED SLIGHTLY BELOW
                               // CHALLENGE CARD
                               Container(
@@ -214,7 +228,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                         fontSize: 18,
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 8),
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: Image.asset(
@@ -224,7 +238,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 8),
                                     Align(
                                       alignment: Alignment.centerLeft,
                                       child: Text(
@@ -237,7 +251,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 5),
+                                    const SizedBox(height: 3),
                                     Text(
                                       isEnglish
                                           ? currentChallenge.factEn
@@ -248,7 +262,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                         height: 1.4,
                                       ),
                                     ),
-                                    const SizedBox(height: 15),
+                                    const SizedBox(height: 10),
                                     ElevatedButton(
                                       onPressed: _isCompleted
                                           ? null
@@ -275,6 +289,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                                   ? 'Complete Challenge'
                                                   : 'Selesaikan Cabaran'),
                                         style: const TextStyle(
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -283,14 +298,14 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                 ),
                               ),
 
-                              const SizedBox(height: 45),
+                              const SizedBox(height: 28),
 
-                              // SUCCESS MESSAGE (SMALLER CARD + STRONGER SHADOW)
+                              // SUCCESS MESSAGE
                               if (_isCompleted)
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 20.0,
-                                  ), // Makes card smaller
+                                  ),
                                   child: Container(
                                     padding: const EdgeInsets.all(15),
                                     decoration: BoxDecoration(
@@ -300,7 +315,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
                                         BoxShadow(
                                           color: Colors.black.withValues(
                                             alpha: 0.35,
-                                          ), // STRONGER SHADOW
+                                          ),
                                           blurRadius: 12,
                                           offset: const Offset(0, 6),
                                         ),
