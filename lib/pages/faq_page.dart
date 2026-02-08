@@ -4,6 +4,7 @@ import 'package:stemxploref2/widgets/gradient_background.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
+import '/widgets/language_toggle.dart';
 
 class FaqPage extends StatefulWidget {
   static const routeName = '/faq';
@@ -134,7 +135,7 @@ class _FaqPageState extends State<FaqPage> {
           child: Column(
             children: [
               // Updated integrated AppBar and Flag Toggle
-              _buildCustomAppBar(title, isEnglish, localization),
+              _buildCustomAppBar(title),
 
               Expanded(
                 child: ListView.builder(
@@ -155,25 +156,10 @@ class _FaqPageState extends State<FaqPage> {
           ),
         ),
       ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
-      ),
     );
   }
 
-  // Same AppBar logic as InfoPage for UI consistency
-  Widget _buildCustomAppBar(
-    String title,
-    bool isEnglish,
-    FlutterLocalization localization,
-  ) {
+  Widget _buildCustomAppBar(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
       child: Row(
@@ -191,62 +177,12 @@ class _FaqPageState extends State<FaqPage> {
               ),
             ),
           ),
-          PopupMenuButton<String>(
-            elevation: 2,
-            position: PopupMenuPosition.under,
-            icon: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  key: ValueKey<bool>(isEnglish),
-                  isEnglish
-                      ? 'assets/flag/language us_flag.png'
-                      : 'assets/flag/language ms_flag.png',
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            onSelected: (value) {
-              setState(() {
-                localization.translate(value);
-              });
+          // Clean implementation using the shared widget
+          LanguageToggle(
+            onLanguageChanged: () {
+              setState(() {}); // Refresh FAQ text immediately
             },
-            itemBuilder: (context) => [
-              _buildPopupMenuItem('en', 'English (Default)', isEnglish),
-              _buildPopupMenuItem('ms', 'Malay', !isEnglish),
-            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopupMenuItem(
-    String value,
-    String text,
-    bool isSelected,
-  ) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          Text(text, style: const TextStyle(fontSize: 14)),
-          if (isSelected) ...[
-            const Spacer(),
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          ],
         ],
       ),
     );

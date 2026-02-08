@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import '/widgets/language_toggle.dart';
 
 class StemInfoPage extends StatefulWidget {
   static const routeName = '/stem-info';
@@ -117,47 +118,43 @@ class _StemInfoPageState extends State<StemInfoPage> {
                         color: Colors.black,
                       ),
                     ),
-                    PopupMenuButton<String>(
-                      elevation: 2,
-                      position: PopupMenuPosition.under,
-                      icon: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 1),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
+                    // Direct Toggle using GestureDetector inside the layout position
+                    GestureDetector(
+                      onTap: () {
+                        // DIRECT CHANGE: Toggles immediately on click
+                        final String nextLocale = isEnglish ? 'ms' : 'en';
+                        localization.translate(nextLocale);
+                        setState(() {});
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(
+                          8,
+                        ), // Padding to match icon button hit area
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              key: ValueKey<bool>(isEnglish),
+                              isEnglish
+                                  ? 'assets/flag/language us_flag.png'
+                                  : 'assets/flag/language ms_flag.png',
+                              width: 36,
+                              height: 36,
+                              fit: BoxFit.cover,
                             ),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            key: ValueKey<bool>(isEnglish),
-                            isEnglish
-                                ? 'assets/flag/language us_flag.png'
-                                : 'assets/flag/language ms_flag.png',
-                            width: 36,
-                            height: 36,
-                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
-                      onSelected: (value) {
-                        // CRITICAL: Call setState so the UI rebuilds with the new language
-                        setState(() {
-                          localization.translate(value);
-                        });
-                      },
-                      itemBuilder: (context) => [
-                        _buildPopupMenuItem(
-                          'en',
-                          'English (Default)',
-                          isEnglish,
-                        ),
-                        _buildPopupMenuItem('ms', 'Malay', !isEnglish),
-                      ],
                     ),
                   ],
                 ),
@@ -259,35 +256,6 @@ class _StemInfoPageState extends State<StemInfoPage> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopupMenuItem(
-    String value,
-    String text,
-    bool isSelected,
-  ) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          Text(text, style: const TextStyle(fontSize: 14)),
-          if (isSelected) ...[
-            const Spacer(),
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          ],
-        ],
       ),
     );
   }

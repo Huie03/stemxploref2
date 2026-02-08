@@ -4,6 +4,7 @@ import '../widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
+import '/widgets/language_toggle.dart';
 
 class LearningMaterialPage extends StatefulWidget {
   static const routeName = '/learning-materials';
@@ -121,17 +122,6 @@ class _LearningMaterialPageState extends State<LearningMaterialPage> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
       ),
     );
   }

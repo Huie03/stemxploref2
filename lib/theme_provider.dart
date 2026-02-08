@@ -15,7 +15,7 @@ class ThemeProvider with ChangeNotifier {
   // Define your Light Theme
   static final lightTheme = ThemeData(
     primarySwatch: Colors.orange,
-    scaffoldBackgroundColor: const Color(0xFFF7E7C3),
+    scaffoldBackgroundColor: const Color(0xFFFEDFB1),
     brightness: Brightness.light,
   );
 

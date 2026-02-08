@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:stemxploref2/widgets/gradient_background.dart';
+import '/widgets/language_toggle.dart';
 
 class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
@@ -11,7 +12,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final FlutterLocalization _localization = FlutterLocalization.instance;
+  final FlutterLocalization localization = FlutterLocalization.instance;
   bool _isDarkMode = false; // Local state for the theme toggle
 
   @override
@@ -31,7 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     // Sync with the global language state
-    final bool isEnglish = _localization.currentLocale?.languageCode == 'en';
+    final bool isEnglish = localization.currentLocale?.languageCode == 'en';
     final String title = isEnglish ? 'Settings' : 'Tetapan';
 
     return Scaffold(
@@ -115,61 +116,13 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          PopupMenuButton<String>(
-            elevation: 2,
-            position: PopupMenuPosition.under,
-            icon: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  isEnglish
-                      ? 'assets/flag/language us_flag.png'
-                      : 'assets/flag/language ms_flag.png',
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            onSelected: (value) {
-              // Updates the global language state
-              _localization.translate(value);
-              setState(() {});
+          LanguageToggle(
+            onLanguageChanged: () {
+              setState(
+                () {},
+              ); // This forces InfoPage to update its text strings
             },
-            itemBuilder: (context) => [
-              _buildPopupMenuItem('en', 'English (Default)', isEnglish),
-              _buildPopupMenuItem('ms', 'Malay', !isEnglish),
-            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopupMenuItem(
-    String value,
-    String text,
-    bool isSelected,
-  ) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          Text(text, style: const TextStyle(fontSize: 14)),
-          if (isSelected) ...[
-            const Spacer(),
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          ],
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import '/widgets/language_toggle.dart';
 
 class HighlightDetailPage extends StatefulWidget {
   static const routeName = '/highlight-detail';
@@ -51,46 +52,12 @@ class _HighlightDetailPageState extends State<HighlightDetailPage> {
                         color: Colors.black,
                       ),
                     ),
-                    PopupMenuButton<String>(
-                      elevation: 2,
-                      position: PopupMenuPosition.under,
-                      icon: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 1),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            key: ValueKey<bool>(isEnglish),
-                            isEnglish
-                                ? 'assets/flag/language us_flag.png'
-                                : 'assets/flag/language ms_flag.png',
-                            width: 36,
-                            height: 36,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      onSelected: (value) {
-                        setState(() {
-                          localization.translate(value);
-                        });
+                    LanguageToggle(
+                      onLanguageChanged: () {
+                        setState(
+                          () {},
+                        ); // This forces InfoPage to update its text strings
                       },
-                      itemBuilder: (context) => [
-                        _buildPopupMenuItem(
-                          'en',
-                          'English (Default)',
-                          isEnglish,
-                        ),
-                        _buildPopupMenuItem('ms', 'Malay', !isEnglish),
-                      ],
                     ),
                   ],
                 ),
@@ -197,36 +164,6 @@ class _HighlightDetailPageState extends State<HighlightDetailPage> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
-      ),
-    );
-  }
-
-  // Helper to match the InfoPage menu items
-  PopupMenuItem<String> _buildPopupMenuItem(
-    String value,
-    String text,
-    bool isSelected,
-  ) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          Text(text, style: const TextStyle(fontSize: 14)),
-          if (isSelected) ...[
-            const Spacer(),
-            const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          ],
-        ],
       ),
     );
   }

@@ -14,7 +14,7 @@ class GradientBackground extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color.fromARGB(255, 255, 215, 155), // top
+            Color.fromRGBO(239, 190, 118, 1), // top
             Color(0xFFFFFFFF), // bottom
           ],
         ),

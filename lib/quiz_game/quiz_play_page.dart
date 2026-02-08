@@ -65,16 +65,6 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
           ),
         ),
       ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
-      ),
     );
   }
 

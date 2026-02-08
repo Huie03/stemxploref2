@@ -13,11 +13,12 @@ import 'quiz_game/quiz_game_page.dart';
 import 'pages/stem_careers_page.dart';
 import 'daily_challenge/daily_challenge_page.dart';
 import 'pages/faq_page.dart';
-import 'pages/bookmark_page.dart';
+import 'bookmark/bookmark_page.dart';
 import 'pages/info_page.dart';
 import 'pages/settings_page.dart';
 import 'stem_highlights/highlight.dart';
 import 'stem_highlights/highlight_detail_page.dart';
+import 'bookmark/bookmark_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,10 @@ void main() async {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => NavigationProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        ChangeNotifierProvider(create: (_) => BookmarkProvider()),
+      ],
       child: const STEMXploreApp(),
     ),
   );
@@ -67,14 +71,27 @@ class _STEMXploreAppState extends State<STEMXploreApp> {
 
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
-        scaffoldBackgroundColor: const Color(0xFFFFFFE0),
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFEDFB1),
+          primary: const Color(0xFFFEDFB1),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFFEDFB1),
+
+        // ADD THIS SECTION TO REMOVE THE ICON BACKGROUND
+        navigationBarTheme: NavigationBarThemeData(
+          indicatorColor:
+              Colors.transparent, // This removes the peach "pill" background
+          labelTextStyle: WidgetStateProperty.all(
+            const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ),
       ),
       initialRoute: SplashPage.routeName,
       routes: {
         SplashPage.routeName: (_) => const SplashPage(),
         MainScreen.routeName: (_) => MainScreen(),
-        HomePage.routeName: (_) => const HomePage(),
+        //HomePage.routeName: (_) => const HomePage(),
         StemInfoPage.routeName: (_) => const StemInfoPage(),
         LearningMaterialPage.routeName: (_) => const LearningMaterialPage(),
         QuizGamePage.routeName: (_) => const QuizGamePage(),

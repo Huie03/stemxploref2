@@ -17,19 +17,24 @@ class AppCurvedNavBar extends StatelessWidget {
     return CurvedNavigationBar(
       index: currentIndex,
       height: 60,
-      backgroundColor: Colors.transparent,
-      color: const Color.fromARGB(255, 242, 196, 88),
-      buttonBackgroundColor: const Color.fromARGB(255, 242, 196, 88),
+
+      backgroundColor: Colors.white,
+
+      color: const Color(0xFFF2C458),
+      buttonBackgroundColor: const Color(0xFFF2C458), // Keeping as requested
+
       animationDuration: const Duration(milliseconds: 300),
       items: [
         const Icon(Icons.home, size: 30),
         const Icon(Icons.bookmark_border, size: 30),
 
+        // Your Info Icon Container
         Container(
           width: 30,
           height: 30,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            color: Colors.transparent,
             border: Border.all(color: Colors.black, width: 2.5),
           ),
           alignment: Alignment.center,

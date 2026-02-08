@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import '/widgets/language_toggle.dart';
 
 class QuizGamePage extends StatefulWidget {
   static const routeName = '/quiz-game';
@@ -90,17 +91,6 @@ class _QuizGamePageState extends State<QuizGamePage> {
           ),
         ),
       ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
-      ),
     );
   }
 
@@ -121,58 +111,15 @@ class _QuizGamePageState extends State<QuizGamePage> {
       centerTitle: true,
       automaticallyImplyLeading: false,
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: PopupMenuButton<String>(
-            color: const Color.fromARGB(255, 236, 233, 233),
-            icon: Image.asset(
-              isEnglish
-                  ? 'assets/flag/language us_flag.png'
-                  : 'assets/flag/language ms_flag.png',
-              width: 40,
-            ),
-            offset: const Offset(0, 50),
-            onSelected: (String value) {
-              localization.translate(value);
-              setState(() {});
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'en',
-                child: Row(
-                  children: [
-                    const Text(
-                      'English (Default)',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    if (isEnglish) const Spacer(),
-                    if (isEnglish)
-                      const Icon(
-                        Icons.check_circle,
-                        size: 20,
-                        color: Colors.green,
-                      ),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'ms',
-                child: Row(
-                  children: [
-                    const Text('Malay', style: TextStyle(fontSize: 15)),
-                    if (!isEnglish) const Spacer(),
-                    if (!isEnglish)
-                      const Icon(
-                        Icons.check_circle,
-                        size: 20,
-                        color: Colors.green,
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        LanguageToggle(
+          onLanguageChanged: () {
+            setState(() {
+              // This triggers a rebuild of QuizGamePage
+              // to update the title and category names
+            });
+          },
         ),
+        const SizedBox(width: 8),
       ],
     );
   }
