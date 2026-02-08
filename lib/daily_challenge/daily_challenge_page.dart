@@ -1,7 +1,7 @@
 // pages/daily_challenge_page.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import '/navigation_provider.dart';
@@ -118,7 +118,7 @@ class _DailyChallengePageState extends State<DailyChallengePage> {
     final String title = isEnglish ? 'Daily Challenge' : 'Cabaran Harian';
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

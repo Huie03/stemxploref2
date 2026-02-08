@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 
 class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
@@ -35,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final String title = isEnglish ? 'Settings' : 'Tetapan';
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

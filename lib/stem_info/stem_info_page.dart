@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/solid_background.dart';
+import '../widgets/gradient_background.dart';
 import 'stem_detail_page.dart';
 import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
@@ -99,7 +99,7 @@ class _StemInfoPageState extends State<StemInfoPage> {
     final String title = isEnglish ? 'STEM Info' : 'Maklumat STEM';
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

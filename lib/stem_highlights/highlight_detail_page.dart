@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'highlight.dart';
-import '../widgets/solid_background.dart';
+import '../widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
@@ -32,7 +32,7 @@ class _HighlightDetailPageState extends State<HighlightDetailPage> {
     final String appBarTitle = isEnglish ? 'STEM Highlights' : 'Sorotan STEM';
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

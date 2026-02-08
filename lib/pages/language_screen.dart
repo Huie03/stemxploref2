@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 import 'language_provider.dart';
 
 class LanguageScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

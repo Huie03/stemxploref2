@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stemxploref2/learning_materials/material_details_page.dart';
-import '../widgets/solid_background.dart';
+import '../widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
@@ -53,7 +53,7 @@ class _LearningMaterialPageState extends State<LearningMaterialPage> {
         : materials.where((m) => m['category'] == selectedCategory).toList();
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'main_screen.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 
 class SplashPage extends StatelessWidget {
   static const routeName = 'splash-page';
@@ -10,15 +11,15 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFE0),
-
-      body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque, // tap anywhere
-          onTap: () {
-            Navigator.pushReplacementNamed(context, MainScreen.routeName);
-          },
-          child: const Center(child: Logo()),
+      body: GradientBackground(
+        child: SafeArea(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              Navigator.pushReplacementNamed(context, MainScreen.routeName);
+            },
+            child: const Center(child: Logo()),
+          ),
         ),
       ),
     );
@@ -30,7 +31,7 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String assetPath = 'assets/images/Logo_F2.png';
+    const String assetPath = 'assets/images/Logo_F2_2.png';
 
     return SizedBox.expand(
       child: Stack(
@@ -71,7 +72,11 @@ class Logo extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 35,
-            child: Icon(Icons.touch_app, size: 40, color: Colors.black45),
+            child: Icon(
+              Icons.touch_app,
+              size: 40,
+              color: Color.fromARGB(255, 255, 166, 0),
+            ),
           ),
 
           // Bottom Instruction Text
@@ -83,8 +88,8 @@ class Logo extends StatelessWidget {
               'Touch to start',
               style: GoogleFonts.alice(
                 textStyle: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
+                  fontSize: 14,
+                  color: Color.fromARGB(136, 0, 0, 0),
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.bold,
                 ),

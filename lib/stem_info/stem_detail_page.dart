@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/solid_background.dart';
+import '../widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
@@ -95,7 +95,7 @@ class _StemDetailPageState extends State<StemDetailPage> {
         : 'Maklumat STEM'; // Localized title
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

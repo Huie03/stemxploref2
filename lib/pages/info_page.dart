@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:stemxploref2/navigation_provider.dart';
 
@@ -30,7 +30,6 @@ class _InfoPageState extends State<InfoPage> {
 
   @override
   void dispose() {
-    // Clean up listener
     FlutterLocalization.instance.onTranslatedLanguage = null;
     super.dispose();
   }
@@ -49,7 +48,7 @@ class _InfoPageState extends State<InfoPage> {
         : 'STEMXplore F2 adalah aplikasi pembelajaran mudah alih yang direka untuk pelajar sekolah menengah Tingkatan 2 untuk meneroka Sains, Teknologi, Kejuruteraan dan Matematik melalui kandungan interaktif, video dan aktiviti pembelajaran. STEMXplore F2 dicipta untuk membantu pelajar memahami konsep STEM dengan lebih baik, meningkatkan minat dalam pembelajaran dan menunjukkan bagaimana STEM diaplikasikan dalam situasi kehidupan sebenar dengan cara yang menyeronokkan, sambil menyokong Matlamat Pembangunan Mampan 4 (Pendidikan Berkualiti).';
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [
@@ -61,8 +60,8 @@ class _InfoPageState extends State<InfoPage> {
                     children: [
                       const SizedBox(height: 10),
                       Image.asset(
-                        'assets/images/Logo_F2.png',
-                        height: 200,
+                        'assets/images/Logo_F2_2.png',
+                        height: 220,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 8),
@@ -70,7 +69,7 @@ class _InfoPageState extends State<InfoPage> {
                         description,
                         textAlign: TextAlign.justify,
                         style: const TextStyle(
-                          fontSize: 15.5,
+                          fontSize: 15,
                           height: 1.5,
                           color: Colors.black,
                           fontWeight: FontWeight.w400,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 
 class BookmarkPage extends StatefulWidget {
   static const String routeName = '/bookmark';
@@ -36,7 +36,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
     final String title = isEnglish ? "Bookmark" : "Penanda Buku";
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [

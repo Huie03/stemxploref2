@@ -18,8 +18,8 @@ class AppCurvedNavBar extends StatelessWidget {
       index: currentIndex,
       height: 60,
       backgroundColor: Colors.transparent,
-      color: const Color(0xFFFFED29),
-      buttonBackgroundColor: const Color(0xFFFFED29),
+      color: const Color.fromARGB(255, 242, 196, 88),
+      buttonBackgroundColor: const Color.fromARGB(255, 242, 196, 88),
       animationDuration: const Duration(milliseconds: 300),
       items: [
         const Icon(Icons.home, size: 30),

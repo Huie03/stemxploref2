@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 import '/stem_highlights/highlight.dart';
 import '/stem_highlights/highlight_detail_page.dart';
 import '/stem_info/stem_info_page.dart';
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [
@@ -279,7 +279,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: const BoxDecoration(
-                  color: const Color(0xFFFFED29),
+                  color: Color(0xFFF2C458),
                   shape: BoxShape.circle,
                 ),
                 child: const Text(
@@ -445,38 +445,52 @@ class _FeatureButton extends StatelessWidget {
         double imageSize = availableHeight * 0.60;
         double fontSize = availableHeight * 0.15;
 
-        return Material(
-          color: const Color(0xFFFFED29),
-          borderRadius: BorderRadius.circular(16),
-          child: InkWell(
+        return Container(
+          // --- ADDED BOX SHADOW HERE ---
+          decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            onTap: onTap,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (imageAsset != null)
-                  Image.asset(
-                    imageAsset!,
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.contain,
-                  )
-                else
-                  Icon(icon, size: imageSize, color: Colors.black87),
-                SizedBox(height: availableHeight * 0.05),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: fontSize.clamp(12, 16),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 8,
+                spreadRadius: 1,
+                offset: const Offset(0, 4), // Moves shadow downwards
+              ),
+            ],
+          ),
+          child: Material(
+            color: const Color.fromARGB(255, 242, 196, 88),
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onTap,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (imageAsset != null)
+                    Image.asset(
+                      imageAsset!,
+                      width: imageSize,
+                      height: imageSize,
+                      fit: BoxFit.contain,
+                    )
+                  else
+                    Icon(icon, size: imageSize, color: Colors.black87),
+                  SizedBox(height: availableHeight * 0.05),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: fontSize.clamp(12, 16),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'l10n/languages.dart';
 import '/navigation_provider.dart';
-
-// Import all your pages
 import 'pages/main_screen.dart';
 import 'pages/splash_page.dart';
 import 'pages/home_page.dart';
@@ -70,7 +68,7 @@ class _STEMXploreAppState extends State<STEMXploreApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.yellow,
-        scaffoldBackgroundColor: const Color(0xFFF7E7C3),
+        scaffoldBackgroundColor: const Color(0xFFFFFFE0),
       ),
       initialRoute: SplashPage.routeName,
       routes: {

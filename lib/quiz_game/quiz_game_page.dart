@@ -1,6 +1,6 @@
 //quiz_game_page
 import 'package:flutter/material.dart';
-import 'package:stemxploref2/widgets/solid_background.dart';
+import 'package:stemxploref2/widgets/gradient_background.dart';
 import 'quiz_play_page.dart';
 import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
@@ -49,7 +49,7 @@ class _QuizGamePageState extends State<QuizGamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SolidBackground(
+      body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [
