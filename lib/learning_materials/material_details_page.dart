@@ -1,190 +1,291 @@
 import 'package:flutter/material.dart';
+import 'package:stemxploref2/theme_provider.dart';
 import 'package:provider/provider.dart';
-import '../widgets/gradient_background.dart';
-import '/navigation_provider.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:stemxploref2/favorite/favorite_provider.dart';
-import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
+import '../widgets/gradient_background.dart';
+import '../widgets/language_toggle.dart';
+import '../widgets/box_shadow.dart';
 
 class MaterialDetailPage extends StatefulWidget {
-  const MaterialDetailPage({super.key});
+  final Map<String, dynamic> chapterData;
+
+  const MaterialDetailPage({super.key, required this.chapterData});
 
   @override
   State<MaterialDetailPage> createState() => _MaterialDetailPageState();
 }
 
 class _MaterialDetailPageState extends State<MaterialDetailPage> {
-  bool _showPopup = false;
-  final String _currentTitle = "Science";
-  final String _currentChapter = "Chapter 3 - Nutrition";
-
-  void _handleBookmark() {
-    final bookmarkProvider = Provider.of<FavoriteProvider>(
-      context,
-      listen: false,
-    );
-
-    final materialData = {
-      "title": _currentTitle,
-      "chapter": _currentChapter,
-      "image": 'assets/images/science_book_cover.png',
-    };
-
-    bookmarkProvider.toggleFavorite(materialData);
-
-    // Show popup only if we just added the bookmark
-    if (bookmarkProvider.isFavorited(_currentTitle, _currentChapter)) {
-      setState(() => _showPopup = true);
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) setState(() => _showPopup = false);
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isBookmarked = context.watch<FavoriteProvider>().isFavorited(
-      _currentTitle,
-      _currentChapter,
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
+    final Color cardBg = Theme.of(context).colorScheme.surface;
+
+    final FlutterLocalization localization = FlutterLocalization.instance;
+
+    final bool isEnglish =
+        localization.currentLocale?.languageCode == 'en' ||
+        localization.currentLocale == null;
+
+    final String rawSubject = widget.chapterData['subject'] ?? "Science";
+    final String titleEn = widget.chapterData['title_en'] ?? "";
+    final String titleMs = widget.chapterData['title_ms'] ?? "";
+    final String chapterNum =
+        widget.chapterData['chapter_number']?.toString() ?? "1";
+
+    final String infographicPath = isEnglish
+        ? (widget.chapterData['infographic_en'] ??
+              'assets/textbook/default.jpg')
+        : (widget.chapterData['infographic_ms'] ??
+              'assets/textbook/default.jpg');
+
+    final String subjectDisplay = _translateSubject(rawSubject, isEnglish);
+    final String chapterTitle = isEnglish ? titleEn : titleMs;
+    final String label = isEnglish ? "Chapter" : "Bab";
+    final String fullChapterString = "$label $chapterNum - $chapterTitle";
+
+    final favoriteProvider = context.watch<FavoriteProvider>();
+
+    final bool isBookmarked = favoriteProvider.isFavorited(
+      rawSubject,
+      chapterNum,
     );
 
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Stack(
-            alignment: Alignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                children: [
-                  AppBar(
-                    leading: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Colors.black,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: Text(
-                      _currentTitle,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    centerTitle: true,
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 10,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  _currentChapter,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: _handleBookmark,
-                                  child: Icon(
-                                    isBookmarked
-                                        ? Icons.bookmark
-                                        : Icons.bookmark_border,
-                                    size: 28,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Content Card
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(40),
-                              border: Border.all(color: Colors.black, width: 1),
-                            ),
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  'assets/images/Science.png',
-                                  height: 100,
-                                  fit: BoxFit.contain,
-                                ),
-                                const SizedBox(height: 20),
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFE8F4FD),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    'Nutrition is the process by which living organisms take in food...',
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Image.asset(
-                                  'assets/images/food_pyramid_image.webp',
-                                  height: 250,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              _buildCustomAppBar(subjectDisplay, textColor),
+              _buildSubHeader(
+                rawSubject,
+                chapterNum,
+                titleEn,
+                titleMs,
+                fullChapterString,
+                isBookmarked,
+                isEnglish,
+                widget.chapterData['image_url'] ?? infographicPath,
+                textColor,
+                isDark,
               ),
-              if (_showPopup)
-                Positioned(
-                  top: MediaQuery.of(context).size.height * 0.45,
-                  child: _buildBookmarkPopup(),
-                ),
+              const SizedBox(height: 0),
+              Expanded(
+                child: _buildMainContent(infographicPath, cardBg, isDark),
+              ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          Provider.of<NavigationProvider>(
-            context,
-            listen: false,
-          ).setIndex(index);
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        },
+    );
+  }
+
+  String _translateSubject(String subject, bool isEnglish) {
+    if (isEnglish) return subject;
+    switch (subject) {
+      case "Science":
+        return "Sains";
+      case "Mathematics":
+        return "Matematik";
+      case "Computer Science (ASK)":
+        return "Asas Sains Komputer (ASK)";
+      case "Design and Technology (RBT)":
+        return "Reka Bentuk dan Teknologi (RBT)";
+      default:
+        return subject;
+    }
+  }
+
+  Widget _buildCustomAppBar(String title, Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(25, 10, 16, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                color: textColor,
+              ),
+            ),
+          ),
+          const LanguageToggle(),
+        ],
       ),
     );
   }
 
-  Widget _buildBookmarkPopup() {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.75,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.black, width: 1),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 15)],
+  Widget _buildSubHeader(
+    String rawSub,
+    String num,
+    String tEn,
+    String tMs,
+    String display,
+    bool isBookmarked,
+    bool isEnglish,
+    String img,
+    Color textColor,
+    bool isDark,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              display,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: textColor,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              final Map<String, String> dataToToggle = {
+                'title': rawSub,
+                'chapter_num': num,
+                'title_en': tEn,
+                'title_ms': tMs,
+                'image': img,
+              };
+
+              final bool currentlyBookmarked = isBookmarked;
+
+              Provider.of<FavoriteProvider>(
+                context,
+                listen: false,
+              ).toggleFavorite(dataToToggle);
+
+              _showCenterPopup(
+                isEnglish,
+                isAdding: !currentlyBookmarked,
+                isDark: isDark,
+              );
+            },
+            icon: Icon(
+              isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+              size: 30,
+              color: isBookmarked ? const Color(0xFFEFA638) : textColor,
+            ),
+          ),
+        ],
       ),
-      child: const Text(
-        'You can continue reading at bookmark',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+    );
+  }
+
+  void _showCenterPopup(
+    bool isEnglish, {
+    required bool isAdding,
+    required bool isDark,
+  }) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.3),
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF3D3D3D) : Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: appBoxShadow,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isAdding ? Icons.bookmark_added : Icons.bookmark_remove,
+                  size: 50,
+                  color: const Color(0xFFEFA638),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  isAdding
+                      ? (isEnglish
+                            ? "You can continue reading at bookmark"
+                            : "Anda boleh teruskan membaca di penanda buku")
+                      : (isEnglish
+                            ? "Bookmark removed"
+                            : "Penanda buku telah dialih keluar"),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEFA638),
+                      foregroundColor: Colors.black,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "OK",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMainContent(String imagePath, Color cardBg, bool isDark) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(0),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(0),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter,
+              errorBuilder: (context, error, stack) => Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Icon(
+                  Icons.broken_image,
+                  size: 80,
+                  color: isDark ? Colors.white24 : Colors.grey,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

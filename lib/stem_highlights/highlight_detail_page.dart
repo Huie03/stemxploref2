@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'highlight.dart';
 import '../widgets/gradient_background.dart';
-import 'package:provider/provider.dart';
-import '/navigation_provider.dart';
-import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import '/widgets/language_toggle.dart';
+import '../widgets/rawscrollbar.dart';
+import '../widgets/box_shadow.dart';
+import 'package:stemxploref2/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HighlightDetailPage extends StatefulWidget {
   static const routeName = '/highlight-detail';
@@ -17,18 +18,35 @@ class HighlightDetailPage extends StatefulWidget {
 }
 
 class _HighlightDetailPageState extends State<HighlightDetailPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final FlutterLocalization localization = FlutterLocalization.instance;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
 
+    final FlutterLocalization localization = FlutterLocalization.instance;
     final String currentLang = localization.currentLocale?.languageCode ?? 'en';
     final bool isEnglish = currentLang == 'en';
 
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
+    final Color cardBg = Theme.of(context).colorScheme.surface;
+    final Color subTextColor = isDark ? Colors.white : Colors.black87;
+
     final String displayTitle = isEnglish
-        ? widget.highlight.title
+        ? widget.highlight.titleEn
         : widget.highlight.titleMs;
-    final Map<String, List<String>> displayDetails = isEnglish
-        ? widget.highlight.details
+    final String displaySubtitle = isEnglish
+        ? widget.highlight.subtitleEn
+        : widget.highlight.subtitleMs;
+    final List<String> displayDetails = isEnglish
+        ? widget.highlight.detailsEn
         : widget.highlight.detailsMs;
     final String appBarTitle = isEnglish ? 'STEM Highlights' : 'Sorotan STEM';
 
@@ -37,127 +55,206 @@ class _HighlightDetailPageState extends State<HighlightDetailPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // --- ADJUSTED APP BAR TO MATCH INFO PAGE ---
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 50), // Balance the flag button
-                    Text(
-                      appBarTitle,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: Colors.black,
+                    Expanded(
+                      child: Text(
+                        appBarTitle,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: textColor,
+                        ),
                       ),
                     ),
-                    LanguageToggle(
-                      onLanguageChanged: () {
-                        setState(
-                          () {},
-                        ); // This forces InfoPage to update its text strings
-                      },
-                    ),
+                    const LanguageToggle(),
                   ],
                 ),
               ),
 
-              // --- END OF ADJUSTED APP BAR ---
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(18),
-                  child: Column(
-                    children: [
-                      Text(
-                        displayTitle,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.black, width: 1),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Image.asset(
-                                widget.highlight.image,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            ...displayDetails.entries.map((entry) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    entry.key,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  ...entry.value.map((point) {
-                                    final bool isImage = point.contains(
-                                      'assets/images/',
-                                    );
-                                    final bool isBlank = point.trim().isEmpty;
-                                    final bool isName =
-                                        point.length < 20 &&
-                                        !point.endsWith('.');
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: AppRawScrollbar(
+                    controller: _scrollController,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
 
-                                    if (isImage) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0,
-                                        ),
+                      padding: const EdgeInsets.fromLTRB(28, 13, 18, 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayTitle,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: isDark ? [] : appBoxShadow,
+                              border: isDark
+                                  ? Border.all(color: Colors.white10)
+                                  : null,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.asset(widget.highlight.image),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+
+                                Text(
+                                  displaySubtitle,
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor,
+                                  ),
+                                ),
+                                Divider(
+                                  height: 15,
+                                  thickness: 1,
+                                  color: isDark
+                                      ? Colors.white24
+                                      : Colors.grey.shade300,
+                                ),
+
+                                ...displayDetails.map((item) {
+                                  if (item.contains('assets/')) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                      ),
+                                      child: Center(
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(
-                                            10,
+                                            15,
                                           ),
-                                          child: Image.asset(point),
+                                          child: Image.asset(item),
                                         ),
-                                      );
-                                    } else if (isBlank) {
-                                      return const SizedBox(height: 12);
-                                    } else {
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                          left: 8,
-                                          top: isName ? 6 : 4,
-                                          bottom: 2,
-                                        ),
-                                        child: Text(
-                                          isName ? point : '• $point',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: isName
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      );
+                                      ),
+                                    );
+                                  }
+
+                                  if (item.contains('Source:') ||
+                                      item.contains('Sumber:')) {
+                                    final bool isEn = item.contains('Source:');
+                                    final String label = isEn
+                                        ? "Source:"
+                                        : "Sumber:";
+
+                                    String body = item
+                                        .replaceFirst(label, '')
+                                        .trim();
+
+                                    final RegExp urlRegExp = RegExp(
+                                      r'(https?://[^\s]+)',
+                                    );
+                                    final Match? match = urlRegExp.firstMatch(
+                                      body,
+                                    );
+
+                                    String citationText = body;
+                                    String urlText = "";
+
+                                    if (match != null) {
+                                      citationText = body
+                                          .substring(0, match.start)
+                                          .trim();
+                                      urlText = match.group(0) ?? "";
                                     }
-                                  }),
-                                  const Divider(height: 30),
-                                ],
-                              );
-                            }),
-                          ],
-                        ),
+
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 15.0),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: subTextColor,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: "$label\n",
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+
+                                              TextSpan(
+                                                text: "$citationText\n",
+                                                style: const TextStyle(
+                                                  height: 1.4,
+                                                ),
+                                              ),
+
+                                              if (urlText.isNotEmpty)
+                                                TextSpan(
+                                                  text: urlText,
+                                                  style: TextStyle(
+                                                    color: isDark
+                                                        ? Colors.lightBlueAccent
+                                                        : Colors.blueAccent,
+                                                    height: 1.5,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final String trimmedItem = item.trim();
+                                  bool isHeading =
+                                      trimmedItem.length < 40 &&
+                                      !trimmedItem.endsWith('.');
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Text(
+                                      isHeading
+                                          ? trimmedItem
+                                          : '• $trimmedItem',
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: isHeading
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        height: 1.4,
+                                        color: subTextColor,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 2),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

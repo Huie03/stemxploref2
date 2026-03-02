@@ -1,34 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_localization/flutter_localization.dart';
 import '/widgets/gradient_background.dart';
-import '/widgets/curved_navigation_bar.dart';
 import '/widgets/language_toggle.dart';
 import '/navigation_provider.dart';
 
-class InfoPage extends StatefulWidget {
+class InfoPage extends StatelessWidget {
   static const routeName = '/info';
   const InfoPage({super.key});
 
   @override
-  State<InfoPage> createState() => _InfoPageState();
-}
-
-class _InfoPageState extends State<InfoPage> {
-  @override
-  void initState() {
-    super.initState();
-    FlutterLocalization.instance.onTranslatedLanguage = (locale) {
-      if (mounted) setState(() {});
-    };
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final FlutterLocalization localization = FlutterLocalization.instance;
-    final bool isEnglish =
-        localization.currentLocale?.languageCode == 'en' ||
-        localization.currentLocale == null;
+    final navProvider = Provider.of<NavigationProvider>(context);
+
+    final bool isEnglish = navProvider.locale.languageCode == 'en';
+
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
 
     final String title = isEnglish ? 'Info' : 'Maklumat';
     final String description = isEnglish
@@ -40,7 +26,7 @@ class _InfoPageState extends State<InfoPage> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildCustomAppBar(title),
+              _buildCustomAppBar(title, textColor),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -56,10 +42,10 @@ class _InfoPageState extends State<InfoPage> {
                       Text(
                         description,
                         textAlign: TextAlign.justify,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           height: 1.5,
-                          color: Colors.black,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 45),
@@ -91,7 +77,7 @@ class _InfoPageState extends State<InfoPage> {
     );
   }
 
-  Widget _buildCustomAppBar(String title) {
+  Widget _buildCustomAppBar(String title, Color textColor) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
       child: Row(
@@ -99,15 +85,14 @@ class _InfoPageState extends State<InfoPage> {
         children: [
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: textColor,
+            ),
           ),
-          LanguageToggle(
-            onLanguageChanged: () {
-              setState(
-                () {},
-              ); // This forces InfoPage to update its text strings
-            },
-          ),
+
+          const LanguageToggle(),
         ],
       ),
     );

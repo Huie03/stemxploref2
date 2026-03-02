@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:provider/provider.dart'; // <--- THIS WAS MISSING
+import 'package:stemxploref2/theme_provider.dart';
 import 'package:stemxploref2/widgets/gradient_background.dart';
-import '/widgets/language_toggle.dart';
+import 'package:stemxploref2/widgets/language_toggle.dart';
+import '../widgets/box_shadow.dart';
 
 class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
@@ -13,27 +16,25 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final FlutterLocalization localization = FlutterLocalization.instance;
-  bool _isDarkMode = false; // Local state for the theme toggle
 
   @override
   void initState() {
     super.initState();
-    // Add this listener
-    FlutterLocalization.instance.onTranslatedLanguage = _onLanguageChanged;
-  }
-
-  // This function will be called whenever translate() is called anywhere in the app
-  void _onLanguageChanged(Locale? locale) {
-    if (mounted) {
-      setState(() {});
-    }
+    localization.onTranslatedLanguage = (locale) {
+      if (mounted) setState(() {});
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    // Sync with the global language state
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+
     final bool isEnglish = localization.currentLocale?.languageCode == 'en';
     final String title = isEnglish ? 'Settings' : 'Tetapan';
+
+    final Color cardBg = Theme.of(context).colorScheme.surface;
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
 
     return Scaffold(
       body: GradientBackground(
@@ -41,55 +42,44 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Consistent AppBar and Flag Toggle
-              _buildCustomAppBar(title, isEnglish),
-
+              _buildCustomAppBar(title, isEnglish, textColor),
               const SizedBox(height: 20),
-
-              // 2. Theme Mode Toggle (Replaces Language)
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
+                margin: const EdgeInsets.symmetric(horizontal: 24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: appBoxShadow,
                 ),
                 child: ListTile(
                   leading: Icon(
-                    _isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                    color: Colors.black,
+                    isDark ? Icons.dark_mode : Icons.light_mode,
+                    color: isDark ? Colors.orangeAccent : Colors.black,
                   ),
                   title: Text(
                     isEnglish ? "Theme Mode" : "Mod Tema",
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
                   ),
                   subtitle: Text(
                     isEnglish
-                        ? (_isDarkMode ? "Dark Mode" : "Light Mode")
-                        : (_isDarkMode ? "Mod Gelap" : "Mod Terang"),
+                        ? (isDark ? "Dark Mode" : "Light Mode")
+                        : (isDark ? "Mod Gelap" : "Mod Terang"),
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
                   ),
                   trailing: Switch(
-                    value: _isDarkMode,
+                    value: isDark,
                     activeColor: Colors.orange,
                     onChanged: (value) {
-                      setState(() {
-                        _isDarkMode = value;
-                        // Add your theme switching logic here if you have a ThemeProvider
-                      });
+                      themeProvider.toggleTheme();
                     },
                   ),
                 ),
               ),
-
-              const SizedBox(height: 10),
-
-              // Optional: Add more settings items here
             ],
           ),
         ),
@@ -97,8 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // Consistent AppBar Logic used in FAQ and Bookmark pages
-  Widget _buildCustomAppBar(String title, bool isEnglish) {
+  Widget _buildCustomAppBar(String title, bool isEnglish, Color textColor) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
       child: Row(
@@ -107,20 +96,14 @@ class _SettingsPageState extends State<SettingsPage> {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
-                color: Colors.black,
+                color: textColor,
               ),
             ),
           ),
-          LanguageToggle(
-            onLanguageChanged: () {
-              setState(
-                () {},
-              ); // This forces InfoPage to update its text strings
-            },
-          ),
+          const LanguageToggle(),
         ],
       ),
     );

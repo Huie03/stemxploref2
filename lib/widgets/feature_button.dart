@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../widgets/box_shadow.dart';
+import 'package:stemxploref2/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class FeatureButton extends StatelessWidget {
   final String label;
@@ -6,7 +9,7 @@ class FeatureButton extends StatelessWidget {
   final String imageAsset;
 
   const FeatureButton({
-    super.key, // Added key support
+    super.key,
     required this.label,
     required this.onTap,
     required this.imageAsset,
@@ -14,6 +17,14 @@ class FeatureButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+
+    final Color buttonColor = isDark
+        ? const Color(0xFF3D3D3D)
+        : const Color(0xFFF2C458);
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         double availableHeight = constraints.maxHeight;
@@ -22,16 +33,11 @@ class FeatureButton extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: isDark ? [] : appBoxShadow,
+            border: isDark ? Border.all(color: Colors.white10, width: 1) : null,
           ),
           child: Material(
-            color: const Color(0xFFF2C458),
+            color: buttonColor,
             borderRadius: BorderRadius.circular(16),
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
@@ -51,10 +57,10 @@ class FeatureButton extends StatelessWidget {
                     child: Text(
                       label,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                   ),

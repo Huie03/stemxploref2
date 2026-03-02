@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stemxploref2/widgets/gradient_background.dart';
+import 'package:stemxploref2/widgets/language_toggle.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_localization/flutter_localization.dart';
-import '/navigation_provider.dart';
-import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
-import 'package:stemxploref2/widgets/language_toggle.dart'; // Import the toggle
+import 'package:stemxploref2/navigation_provider.dart';
+import 'package:stemxploref2/theme_provider.dart';
+import '../widgets/box_shadow.dart';
 
 class Info {
   final String titleEn;
@@ -96,21 +96,22 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final FlutterLocalization localization = FlutterLocalization.instance;
-    final bool isEnglish =
-        localization.currentLocale?.languageCode == 'en' ||
-        localization.currentLocale == null;
+    final navProvider = Provider.of<NavigationProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    final bool isDark = themeProvider.isDarkMode;
+    final bool isEnglish = navProvider.locale.languageCode == 'en';
 
     final int dayIndex = DateTime.now().day % _challenges.length;
     final currentChallenge = _challenges[dayIndex];
     final String title = isEnglish ? 'Daily Info' : 'Maklumat Harian';
+    final Color titleColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [
-              // --- CUSTOM APP BAR ---
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
                 child: Row(
@@ -118,22 +119,18 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 22,
-                        color: Colors.black,
+                        color: titleColor,
                       ),
                     ),
-                    // Updated to use shared widget with callback
-                    LanguageToggle(
-                      onLanguageChanged: () {
-                        setState(() {});
-                      },
-                    ),
+
+                    const LanguageToggle(),
                   ],
                 ),
               ),
-              // --- CONTENT ---
+              //CONTENT
               Expanded(
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -143,9 +140,14 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
                           child: Column(
                             children: [
                               const SizedBox(height: 25),
-                              _buildChallengeCard(currentChallenge, isEnglish),
+                              _buildChallengeCard(
+                                currentChallenge,
+                                isEnglish,
+                                isDark,
+                              ),
                               const SizedBox(height: 28),
-                              if (_isCompleted) _buildSuccessMessage(isEnglish),
+                              if (_isCompleted)
+                                _buildSuccessMessage(isEnglish, isDark),
                               const SizedBox(height: 20),
                             ],
                           ),
@@ -159,19 +161,18 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
     );
   }
 
-  Widget _buildChallengeCard(Info info, bool isEnglish) {
+  Widget _buildChallengeCard(Info info, bool isEnglish, bool isDark) {
+    final Color cardBg = Theme.of(context).colorScheme.surface;
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
+    final Color subTextColor = isDark ? Colors.white70 : Colors.black87;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        boxShadow: isDark ? [] : appBoxShadow,
+        border: isDark ? Border.all(color: Colors.white10) : null,
       ),
       child: Column(
         children: [
@@ -180,7 +181,11 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
                 ? 'STEM Fact of the Day – ${info.titleEn}'
                 : 'Fakta STEM Hari Ini – ${info.titleMs}',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: textColor,
+            ),
           ),
           const SizedBox(height: 12),
           ClipRRect(
@@ -197,21 +202,31 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               isEnglish ? 'Do you know' : 'Tahukah anda',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: textColor,
+              ),
             ),
           ),
           const SizedBox(height: 5),
           Text(
             isEnglish ? info.factEn : info.factMs,
             textAlign: TextAlign.justify,
-            style: const TextStyle(fontSize: 15, height: 1.4),
+            style: TextStyle(fontSize: 15, height: 1.4, color: subTextColor),
           ),
           const SizedBox(height: 15),
           ElevatedButton(
             onPressed: _isCompleted ? null : _handleComplete,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor: isDark ? const Color(0xFFEFA638) : Colors.black,
+              foregroundColor: isDark ? Colors.black : Colors.white,
+              disabledBackgroundColor: isDark
+                  ? Colors.white10
+                  : Colors.grey.shade300,
+              disabledForegroundColor: isDark
+                  ? Colors.white38
+                  : Colors.grey.shade600,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -229,27 +244,32 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
     );
   }
 
-  Widget _buildSuccessMessage(bool isEnglish) {
+  Widget _buildSuccessMessage(bool isEnglish, bool isDark) {
+    final Color cardBg = Theme.of(context).colorScheme.surface;
+
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: isDark ? [] : appBoxShadow,
+        border: isDark ? Border.all(color: Colors.white12) : null,
       ),
       child: Column(
         children: [
-          const Icon(Icons.check_circle, color: Color(0xFF5DF162), size: 40),
+          Icon(
+            Icons.check_circle,
+            color: isDark ? const Color(0xFF5DF162) : const Color(0xFF5DF162),
+            size: 40,
+          ),
           const SizedBox(height: 10),
           Text(
             isEnglish ? 'Well done!' : 'Syabas!',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: isDark ? Colors.white : Colors.black,
+            ),
           ),
           const SizedBox(height: 5),
           Text(
@@ -257,7 +277,10 @@ class _DailyChallengePageState extends State<DailyInfoPage> {
                 ? 'You completed today\'s challenge.'
                 : 'Anda telah menyelesaikan cabaran hari ini.',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13),
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
           ),
         ],
       ),

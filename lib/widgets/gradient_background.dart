@@ -1,5 +1,6 @@
-//gradient background
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:stemxploref2/theme_provider.dart';
 
 class GradientBackground extends StatelessWidget {
   final Widget child;
@@ -8,15 +9,17 @@ class GradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFEFA638), // top
-            Color(0xFFFFFFFF), // bottom
-          ],
+          colors: isDark
+              ? [const Color(0xFF121212), const Color(0xFF121212)]
+              : [const Color(0xFFEFA638), const Color(0xFFFFFFFF)],
         ),
       ),
       child: child,

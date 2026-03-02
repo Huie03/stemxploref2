@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '/navigation_provider.dart';
 import '/widgets/curved_navigation_bar.dart';
 
-// Page Imports
 import 'home_page.dart';
 import '../favorite/favorite_page.dart';
 import 'info_page.dart';
@@ -11,10 +10,14 @@ import 'settings_page.dart';
 import '/stem_info/stem_info_page.dart';
 import '/learning_materials/learning_materials_page.dart';
 import '/quiz_game/quiz_game_page.dart';
-import '/pages/stem_careers_page.dart';
+import '../quiz_game/play_quiz_page.dart';
+import '/stem_career/stem_careers_page.dart';
 import '../daily_info/daily_info_page.dart';
 import '/pages/faq_page.dart';
 import '/stem_highlights/highlight_detail_page.dart';
+import 'package:stemxploref2/learning_materials/subject_chapters_page.dart';
+import 'package:stemxploref2/learning_materials/material_details_page.dart'; // Add this
+import '/stem_info/stem_detail_page.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main';
@@ -26,50 +29,124 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   dynamic selectedHighlight;
+  dynamic selectedStemInfo;
+  String? selectedSubjectName;
+  Map<String, dynamic>? selectedChapterData;
+  String? selectedQuizData;
+
+  void onSubjectSelected(String subjectName) {
+    setState(() => selectedSubjectName = subjectName);
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(12);
+  }
+
+  void onChapterSelected(Map<String, dynamic> chapterData) {
+    setState(() => selectedChapterData = chapterData);
+    Provider.of<NavigationProvider>(
+      context,
+      listen: false,
+    ).setIndex(13); // Go to Detail
+  }
+
+  void onQuizSubjectSelected(String subjectAndMode) {
+    setState(() => selectedQuizData = subjectAndMode);
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(14);
+  }
 
   void onHighlightSelected(dynamic highlight) {
-    setState(() {
-      selectedHighlight = highlight;
-    });
+    setState(() => selectedHighlight = highlight);
     Provider.of<NavigationProvider>(context, listen: false).setIndex(10);
+  }
+
+  void onStemSelect(dynamic stemInfo) {
+    setState(() => selectedStemInfo = stemInfo);
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(11);
   }
 
   @override
   Widget build(BuildContext context) {
     final navProvider = Provider.of<NavigationProvider>(context);
 
+    final int activeNavIconIndex = (navProvider.currentIndex > 3)
+        ? 0
+        : navProvider.currentIndex;
+
     final List<Widget> pages = [
       HomePage(onHighlightTap: onHighlightSelected), // 0
       const FavoritePage(), // 1
       const InfoPage(), // 2
       const SettingsPage(), // 3
-      const StemInfoPage(), // 4
-      const LearningMaterialPage(), // 5
-      const QuizGamePage(), // 6
+      StemInfoPage(onSelect: onStemSelect), // 4
+      LearningMaterialPage(
+        onSubjectTap: onSubjectSelected,
+        onBackOverride: () => navProvider.setIndex(0),
+      ), // 5
+      QuizGamePage(
+        selected: onQuizSubjectSelected,
+        onBackOverride: () => navProvider.setIndex(0),
+      ), // 6
       const StemCareersPage(), // 7
       const DailyInfoPage(), // 8
       const FaqPage(), // 9
 
       selectedHighlight != null
           ? HighlightDetailPage(highlight: selectedHighlight)
-          : const SizedBox(), // 10
+          : const SizedBox.shrink(), // 10
+
+      selectedStemInfo != null
+          ? StemDetailPage(
+              key: ValueKey(selectedStemInfo['title_en'] ?? 'stem_detail'),
+              stemInfo: selectedStemInfo,
+            )
+          : const SizedBox.shrink(), // 11
+
+      selectedSubjectName != null
+          ? SubjectChaptersPage(
+              initialSubject: selectedSubjectName!,
+              onChapterTap: onChapterSelected,
+            )
+          : const SizedBox.shrink(), // 12
+
+      selectedChapterData != null
+          ? MaterialDetailPage(chapterData: selectedChapterData!)
+          : const SizedBox.shrink(), // 13
+
+      selectedQuizData != null
+          ? PlayQuizPage(
+              subjectAndMode: selectedQuizData!,
+              onFinish: () => navProvider.setIndex(6),
+            )
+          : const SizedBox.shrink(), // 14
     ];
 
-    return Scaffold(
-      extendBody: true,
-      resizeToAvoidBottomInset: false,
-      // The navigation bar stays here, so it's always visible
-      bottomNavigationBar: AppCurvedNavBar(
-        currentIndex: (navProvider.currentIndex > 3)
-            ? 0
-            : navProvider.currentIndex,
-        onTap: (index) {
-          navProvider.setIndex(index);
-        },
-      ),
-      body: SafeArea(
-        bottom: false,
-        child: IndexedStack(index: navProvider.currentIndex, children: pages),
+    return PopScope(
+      canPop: navProvider.currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
+        if (navProvider.currentIndex == 14) {
+          navProvider.setIndex(6); // Back to Quiz List from the Game
+        } else if (navProvider.currentIndex == 13) {
+          navProvider.setIndex(12); // Back to Chapters from Detail
+        } else if (navProvider.currentIndex == 12) {
+          navProvider.setIndex(5); // Back to Subjects from Chapters
+        } else if (navProvider.currentIndex == 10 ||
+            navProvider.currentIndex == 11) {
+          navProvider.setIndex(navProvider.currentIndex == 10 ? 0 : 4);
+        } else {
+          navProvider.setIndex(0);
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        bottomNavigationBar: AppCurvedNavBar(
+          currentIndex: activeNavIconIndex,
+          onTap: (index) => navProvider.setIndex(index),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          bottom: false,
+          child: IndexedStack(index: navProvider.currentIndex, children: pages),
+        ),
       ),
     );
   }

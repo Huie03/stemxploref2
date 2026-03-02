@@ -1,122 +1,111 @@
 import 'package:flutter/material.dart';
-import 'package:stemxploref2/learning_materials/material_details_page.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import '../widgets/gradient_background.dart';
+import '../widgets/language_toggle.dart';
+import '../widgets/box_shadow.dart';
+import 'package:stemxploref2/theme_provider.dart';
 import 'package:provider/provider.dart';
-import '/navigation_provider.dart';
-import 'package:stemxploref2/widgets/curved_navigation_bar.dart';
-import '/widgets/language_toggle.dart';
 
 class LearningMaterialPage extends StatefulWidget {
-  static const routeName = '/learning-materials';
-  const LearningMaterialPage({super.key});
+  final Function(String) onSubjectTap;
+  final VoidCallback? onBackOverride;
+
+  const LearningMaterialPage({
+    super.key,
+    required this.onSubjectTap,
+    this.onBackOverride,
+  });
 
   @override
   State<LearningMaterialPage> createState() => _LearningMaterialPageState();
 }
 
 class _LearningMaterialPageState extends State<LearningMaterialPage> {
-  // Track the selected category
-  String selectedCategory = "All";
-
-  // Materials data
-  final List<Map<String, String>> materials = [
+  final List<Map<String, String>> materials = const [
+    {"title": "Science", "image": 'assets/textbook/Science/BC_Science.jpg'},
     {
-      "title": "Science Form 2",
-      "subtitle": "Chapter 3",
-      "category": "Science",
-      "image": 'assets/images/science_book_cover.png',
+      "title": "Mathematics",
+      "image": 'assets/textbook/Mathematics/BC_Mathematics.jpg',
     },
     {
-      "title": "Mathematics Form 2",
-      "subtitle": "Chapter 1",
-      "category": "Mathematics",
-      "image": 'assets/images/math_book_cover.png',
+      "title": "Computer Science (ASK)",
+      "image": 'assets/textbook/ASK/BC_ASK.jpg',
     },
     {
-      "title": "Asas Sains Komputer Form 2",
-      "subtitle": "Chapter 1",
-      "category": "Asas Sains Komputer",
-      "image": 'assets/images/ask_book_cover.png',
-    },
-    {
-      "title": "Reka Bentuk Dan Teknologi Form 2",
-      "subtitle": "Chapter 1",
-      "category": "Reka Bentuk Dan Teknologi",
-      "image": 'assets/images/rbt_book_cover.png',
+      "title": "Design and Technology (RBT)",
+      "image": 'assets/textbook/RBT/BC_RBT.jpg',
     },
   ];
 
+  String _translateTitle(String title, bool isEnglish) {
+    if (isEnglish) return title;
+    switch (title) {
+      case "Science":
+        return "Sains";
+      case "Mathematics":
+        return "Matematik";
+      case "Computer Science (ASK)":
+        return "Asas Sains Komputer (ASK)";
+      case "Design and Technology (RBT)":
+        return "Reka Bentuk dan Teknologi (RBT)";
+      default:
+        return title;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Filter the list based on selection
-    final filteredMaterials = selectedCategory == "All"
-        ? materials
-        : materials.where((m) => m['category'] == selectedCategory).toList();
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
+    final Color cardBg = Theme.of(context).colorScheme.surface;
+
+    final FlutterLocalization localization = FlutterLocalization.instance;
+    final bool isEnglish =
+        localization.currentLocale?.languageCode == 'en' ||
+        localization.currentLocale == null;
+
+    final String pageTitle = isEnglish
+        ? 'Learning Material'
+        : 'Bahan Pembelajaran';
+    final String subjectHeader = isEnglish ? 'Subjects' : 'Subjek';
 
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppBar(
-                title: const Text(
-                  'Learning Material',
+              _buildCustomAppBar(pageTitle, textColor),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
+                child: Text(
+                  subjectHeader,
                   style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                centerTitle: true,
-                automaticallyImplyLeading: false,
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Favorite",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-
-                      // Example favorite card
-                      _buildMaterialCard(
-                        context,
-                        title: "Science Form 2",
-                        subtitle: "Chapter 3",
-                        imagePath: 'assets/images/science_book_cover.png',
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MaterialDetailPage(),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 25),
-                      _buildCategoryTabs(),
-                      const SizedBox(height: 15),
-
-                      // Dynamic list of filtered cards
-                      ...filteredMaterials.map((item) {
-                        return _buildMaterialCard(
-                          context,
-                          title: item['title']!,
-                          subtitle: item['subtitle']!,
-                          imagePath: item['image']!,
-                        );
-                      }).toList(),
-                    ],
-                  ),
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
+                  itemCount: materials.length,
+                  itemBuilder: (context, index) {
+                    final item = materials[index];
+                    return _buildMaterialCard(
+                      context,
+                      isDark: isDark,
+                      cardBg: cardBg,
+                      textColor: textColor,
+                      title: _translateTitle(item['title']!, isEnglish),
+                      imagePath: item['image']!,
+                      onTap: () => widget.onSubjectTap(item['title']!),
+                    );
+                  },
                 ),
               ),
             ],
@@ -126,107 +115,69 @@ class _LearningMaterialPageState extends State<LearningMaterialPage> {
     );
   }
 
-  Widget _buildCategoryTabs() {
-    List<String> categories = [
-      "All",
-      "Science",
-      "Mathematics",
-      "Asas Sains Komputer",
-      "Reka Bentuk Dan Teknologi",
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+  Widget _buildCustomAppBar(String title, Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
       child: Row(
-        children: categories
-            .map((cat) => _tabItem(cat, selectedCategory == cat))
-            .toList(),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: textColor,
+            ),
+          ),
+          const LanguageToggle(),
+        ],
       ),
     );
   }
 
-  Widget _tabItem(String label, bool active) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedCategory = label;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-        decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.white.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: active ? Colors.black : Colors.black12,
-            width: active ? 1.5 : 0.5,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: active ? Colors.black : Colors.black54,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // _buildMaterialCard method
   Widget _buildMaterialCard(
     BuildContext context, {
     required String title,
-    required String subtitle,
+    required bool isDark,
+    required Color cardBg,
+    required Color textColor,
     required String imagePath,
     VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 18),
-        padding: const EdgeInsets.all(15),
+        margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: cardBg,
+          borderRadius: BorderRadius.circular(24),
+          border: isDark ? Border.all(color: Colors.white10, width: 0.5) : null,
+          boxShadow: isDark ? [] : appBoxShadow,
         ),
         child: Row(
           children: [
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                  color: textColor,
+                ),
               ),
             ),
-            Container(
-              width: 85,
-              height: 65,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(
-                  image: AssetImage(imagePath),
-                  fit: BoxFit.cover,
+            const SizedBox(width: 15),
+            SizedBox(
+              height: 85,
+              width: 65,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.contain,
+                errorBuilder: (c, e, s) => Icon(
+                  Icons.book,
+                  size: 50,
+                  color: isDark ? Colors.white54 : Colors.grey,
                 ),
               ),
             ),

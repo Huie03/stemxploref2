@@ -5,26 +5,65 @@ class ThemeProvider with ChangeNotifier {
 
   bool get isDarkMode => _isDarkMode;
 
+  ThemeMode get themeMode => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
   ThemeData get currentTheme => _isDarkMode ? darkTheme : lightTheme;
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
-    notifyListeners(); // This tells the whole app to rebuild
+    notifyListeners(); //Tells the whole app to rebuild
   }
 
-  // Define your Light Theme
+  //Light Theme
   static final lightTheme = ThemeData(
-    primarySwatch: Colors.orange,
-    scaffoldBackgroundColor: const Color(0xFFFEDFB1),
-    brightness: Brightness.light,
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFFEFA638),
+      primary: const Color(0xFFEFA638),
+    ),
+    scaffoldBackgroundColor: const Color(0xFFEFA638),
+
+    navigationBarTheme: NavigationBarThemeData(
+      indicatorColor: Colors.transparent,
+      labelTextStyle: WidgetStateProperty.all(
+        const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+      ),
+    ),
   );
 
   // Define your Dark Theme
   static final darkTheme = ThemeData(
-    primarySwatch: Colors.deepOrange,
-    scaffoldBackgroundColor: const Color(0xFF121212),
+    useMaterial3: true,
     brightness: Brightness.dark,
-    // Add specific dark mode styles here
-    textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.white)),
+
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFFEFA638),
+      brightness: Brightness.dark,
+      primary: const Color(0xFFEFA638), //
+      surface: const Color(0xFF3D3D3D), // dark card color
+      onSurface: Colors.white, // Default text color on surface
+    ),
+
+    scaffoldBackgroundColor: const Color(0xFF121212),
+
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: const Color(0xFF1E1E1E),
+      indicatorColor: Colors.transparent,
+      labelTextStyle: WidgetStateProperty.all(
+        const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+      ),
+      iconTheme: WidgetStateProperty.all(
+        const IconThemeData(color: Colors.white),
+      ),
+    ),
+
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF121212),
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
   );
 }

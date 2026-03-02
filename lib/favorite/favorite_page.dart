@@ -1,62 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_localization/flutter_localization.dart';
-import '/widgets/gradient_background.dart';
-import '/widgets/language_toggle.dart';
+import 'package:stemxploref2/navigation_provider.dart';
+import 'package:stemxploref2/theme_provider.dart';
+import '../widgets/gradient_background.dart';
+import '../widgets/language_toggle.dart';
 import 'favorite_provider.dart';
+import '../widgets/box_shadow.dart';
 
-class FavoritePage extends StatefulWidget {
+class FavoritePage extends StatelessWidget {
   static const String routeName = '/favorite';
   const FavoritePage({super.key});
 
-  @override
-  State<FavoritePage> createState() => _FavoritePageState();
-}
+  // Translation Helper
+  String _translateSubject(String subject, bool isEnglish) {
+    if (isEnglish) return subject;
+    switch (subject) {
+      case "Science":
+        return "Sains";
+      case "Mathematics":
+        return "Matematik";
+      case "Computer Science (ASK)":
+        return "Asas Sains Komputer (ASK)";
+      case "Design and Technology (RBT)":
+        return "Reka Bentuk dan Teknologi (RBT)";
+      default:
+        return subject;
+    }
+  }
 
-class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
-    final localization = FlutterLocalization.instance;
-    final bool isEnglish =
-        localization.currentLocale?.languageCode == 'en' ||
-        localization.currentLocale == null;
-
-    final favoriteProvider = context.watch<FavoriteProvider>();
-    final favorites = favoriteProvider.bookmarks;
+    final navProvider = Provider.of<NavigationProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+    final bool isEnglish = navProvider.locale.languageCode == 'en';
+    final favorites = context.watch<FavoriteProvider>().bookmarks;
+    final Color titleColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
           child: Column(
             children: [
-              // Exact same header logic as InfoPage
-              _buildCustomAppBar(isEnglish ? "Favorite" : "Kegemaran"),
+              _buildCustomAppBar(
+                isEnglish ? "Favorite" : "Kegemaran",
+                titleColor,
+              ),
               const SizedBox(height: 20),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    isEnglish
-                        ? "Last access learning materials:"
-                        : "Bahan pembelajaran terakhir dicapai:",
-                    style: const TextStyle(
+                    isEnglish ? "Last access:" : "Terakhir dicapai:",
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: titleColor,
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 15),
-
               Expanded(
                 child: favorites.isEmpty
-                    ? _buildNoRecordContainer(isEnglish)
-                    : _buildFavoriteList(context, favorites, isEnglish),
+                    ? Center(
+                        child: _buildNoRecordContainer(
+                          context,
+                          isEnglish,
+                          isDark,
+                        ),
+                      )
+                    : _buildFavoriteList(context, favorites, isEnglish, isDark),
               ),
+              const SizedBox(height: 70),
             ],
           ),
         ),
@@ -64,8 +82,7 @@ class _FavoritePageState extends State<FavoritePage> {
     );
   }
 
-  // UPDATED: Matches InfoPage structure and padding exactly
-  Widget _buildCustomAppBar(String title) {
+  Widget _buildCustomAppBar(String title, Color titleColor) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
       child: Row(
@@ -73,47 +90,40 @@ class _FavoritePageState extends State<FavoritePage> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 22,
-            ), // Size 22 matches InfoPage
+              color: titleColor,
+            ),
           ),
-          LanguageToggle(
-            onLanguageChanged: () {
-              setState(() {});
-            },
-          ),
+          const LanguageToggle(),
         ],
       ),
     );
   }
 
-  Widget _buildNoRecordContainer(bool isEnglish) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 25),
-        padding: const EdgeInsets.symmetric(vertical: 40),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(35),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Text(
-          isEnglish ? "No record" : "Tiada rekod",
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 18,
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
+  Widget _buildNoRecordContainer(
+    BuildContext context,
+    bool isEnglish,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    return Container(
+      width: 250,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(35),
+        boxShadow: isDark ? [] : appBoxShadow,
+        border: isDark ? Border.all(color: Colors.white10) : null,
+      ),
+      child: Text(
+        isEnglish ? "No record" : "Tiada rekod",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 18,
+          color: isDark ? Colors.white : Colors.black,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -123,27 +133,37 @@ class _FavoritePageState extends State<FavoritePage> {
     BuildContext context,
     List<Map<String, String>> favorites,
     bool isEnglish,
+    bool isDark,
   ) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 25),
       itemCount: favorites.length,
       itemBuilder: (context, index) {
+        final colorScheme = Theme.of(context).colorScheme;
         final item = favorites[index];
+        final String subject = _translateSubject(
+          item['title'] ?? '',
+          isEnglish,
+        );
+        final String label = isEnglish ? "Chapter" : "Bab";
+        final String title = isEnglish
+            ? (item['title_en'] ?? "")
+            : (item['title_ms'] ?? "");
+        final String chapterNum = item['chapter_num'] ?? "1";
+        final String fullSubtitle = "$label $chapterNum- $title";
         return Padding(
           padding: const EdgeInsets.only(bottom: 15),
           child: Slidable(
-            key: ValueKey(item['chapter']),
+            key: ValueKey(item['chapter_num']),
             endActionPane: ActionPane(
               motion: const DrawerMotion(),
               extentRatio: 0.25,
               children: [
                 SlidableAction(
-                  onPressed: (context) {
-                    Provider.of<FavoriteProvider>(
-                      context,
-                      listen: false,
-                    ).toggleFavorite(item);
-                  },
+                  onPressed: (context) => Provider.of<FavoriteProvider>(
+                    context,
+                    listen: false,
+                  ).toggleFavorite(item),
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                   icon: Icons.delete,
@@ -153,30 +173,37 @@ class _FavoritePageState extends State<FavoritePage> {
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                border: Border.all(
+                  color: isDark ? Colors.white10 : colorScheme.outlineVariant,
+                ),
+                boxShadow: isDark ? [] : appBoxShadow,
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.all(15),
                 title: Text(
-                  item['title'] ?? '',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  subject,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                 ),
-                subtitle: Text(item['chapter'] ?? ''),
+                subtitle: Text(
+                  fullSubtitle,
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
+                ),
                 trailing: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.asset(
-                    item['image'] ?? 'assets/images/science_book_cover.png',
+                    item['image'] ?? '',
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stack) =>
+                        const Icon(Icons.book, size: 40, color: Colors.grey),
                   ),
                 ),
               ),

@@ -1,35 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart';
+import 'package:provider/provider.dart';
+import '../navigation_provider.dart';
+import 'package:stemxploref2/theme_provider.dart';
+import 'box_shadow.dart';
 
-class LanguageToggle extends StatefulWidget {
-  // Add this line
+class LanguageToggle extends StatelessWidget {
   final VoidCallback? onLanguageChanged;
 
   const LanguageToggle({super.key, this.onLanguageChanged});
 
   @override
-  State<LanguageToggle> createState() => _LanguageToggleState();
-}
-
-class _LanguageToggleState extends State<LanguageToggle> {
-  @override
   Widget build(BuildContext context) {
-    final FlutterLocalization localization = FlutterLocalization.instance;
-    final bool isEnglish =
-        localization.currentLocale?.languageCode == 'en' ||
-        localization.currentLocale == null;
+    final navProvider = Provider.of<NavigationProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    final bool isDark = themeProvider.isDarkMode;
+    final bool isEnglish = navProvider.locale.languageCode == 'en';
+
+    final Color borderColor = isDark ? Colors.white : Colors.black;
+    final Color circleBgColor = isDark ? Colors.grey[800]! : Colors.white;
 
     return GestureDetector(
       onTap: () {
-        final String nextLocale = isEnglish ? 'ms' : 'en';
-        localization.translate(nextLocale);
+        final Locale nextLocale = isEnglish
+            ? const Locale('ms')
+            : const Locale('en');
+        navProvider.setLocale(nextLocale);
 
-        // 1. Refresh the flag itself
-        setState(() {});
-
-        // 2. Refresh the parent page
-        if (widget.onLanguageChanged != null) {
-          widget.onLanguageChanged!();
+        if (onLanguageChanged != null) {
+          onLanguageChanged!();
         }
       },
       child: Container(
@@ -37,15 +36,9 @@ class _LanguageToggleState extends State<LanguageToggle> {
         child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white,
-            border: Border.all(color: Colors.black, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: circleBgColor,
+            border: Border.all(color: borderColor, width: 1.2),
+            boxShadow: appBoxShadow,
           ),
           child: ClipOval(
             child: Image.asset(

@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_localization/flutter_localization.dart';
+import 'package:stemxploref2/theme_provider.dart';
 import '/navigation_provider.dart';
 import '/widgets/gradient_background.dart';
 import '/widgets/language_toggle.dart';
 import '/stem_highlights/highlight.dart';
 import '/widgets/feature_button.dart';
+import '../widgets/box_shadow.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home';
@@ -21,10 +22,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<Highlight> highlights = sampleHighlights;
   final ScrollController _scrollController = ScrollController();
-
   Timer? _autoScrollTimer;
-  // Adjusted for standard card sizing
-  final double _stepSize = 272.0;
+  final double _stepSize = 320.0;
 
   final List<Map<String, dynamic>> _features = [
     {'key': 'stemInfo', 'icon': 'assets/icons/1.png', 'index': 4},
@@ -38,36 +37,39 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    FlutterLocalization.instance.onTranslatedLanguage = _onLanguageChanged;
     WidgetsBinding.instance.addPostFrameCallback((_) => _startAutoScroll());
   }
 
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_scrollController.hasClients) {
+        final double screenWidth = MediaQuery.of(context).size.width;
+        final bool isTablet = screenWidth > 600;
+
+        double dynamicStepSize = (isTablet ? 320.0 : 280.0) + 15.0;
+
         double maxExtent = _scrollController.position.maxScrollExtent;
         double currentOffset = _scrollController.offset;
 
         if (currentOffset >= maxExtent - 10) {
           _scrollController.animateTo(
             0,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeOutQuart,
+            duration: const Duration(milliseconds: 1500),
+            curve: Curves.easeOutExpo,
           );
         } else {
+          double nextTarget =
+              ((currentOffset / dynamicStepSize).round() + 1) * dynamicStepSize;
+
           _scrollController.animateTo(
-            currentOffset + _stepSize,
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeInOut,
+            nextTarget.clamp(0.0, maxExtent),
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeInOutCubic,
           );
         }
       }
     });
-  }
-
-  void _onLanguageChanged(Locale? locale) {
-    if (mounted) setState(() {});
   }
 
   @override
@@ -93,11 +95,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final navProvider = Provider.of<NavigationProvider>(context, listen: false);
-    final bool isEnglish =
-        FlutterLocalization.instance.currentLocale?.languageCode == 'en';
+    final navProvider = Provider.of<NavigationProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context); // ADDED
 
-    // Check screen width
+    final bool isDark = themeProvider.isDarkMode;
+    final bool isEnglish = navProvider.locale.languageCode == 'en';
+    final Color textColor = Theme.of(context).colorScheme.onSurface;
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth > 600;
 
@@ -105,11 +109,10 @@ class _HomePageState extends State<HomePage> {
       child: SafeArea(
         child: Column(
           children: [
-            _buildTopBar(),
+            _buildTopBar(textColor),
             Expanded(
               child: Center(
                 child: Container(
-                  // KEY FIX: Limit width on Tablet so 2 columns don't stretch too much
                   constraints: BoxConstraints(
                     maxWidth: isTablet ? 550 : double.infinity,
                   ),
@@ -124,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                         child: GridView.count(
                           padding: EdgeInsets.zero,
                           shrinkWrap: true,
-                          crossAxisCount: 2, // Fixed at 2 columns as requested
+                          crossAxisCount: 2,
                           mainAxisSpacing: 15,
                           crossAxisSpacing: 15,
                           childAspectRatio: 1.2,
@@ -139,9 +142,18 @@ class _HomePageState extends State<HomePage> {
                           }).toList(),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      const Divider(thickness: 1, height: 20),
-                      _buildHighlightsSection(isEnglish, isTablet),
+                      const SizedBox(height: 25),
+                      Divider(
+                        thickness: 2,
+                        height: 1,
+                        color: isDark ? Colors.white : Colors.black12,
+                      ),
+                      _buildHighlightsSection(
+                        isEnglish,
+                        isTablet,
+                        textColor,
+                        isDark,
+                      ),
                     ],
                   ),
                 ),
@@ -153,64 +165,50 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHighlightsSection(bool isEnglish, bool isTablet) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildTopBar(Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [_buildLogo(textColor), const LanguageToggle()],
+      ),
+    );
+  }
+
+  Widget _buildLogo(Color textColor) {
+    return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0, top: 6.0, bottom: 12.0),
-          child: Text(
-            translate('highlights', isEnglish),
+        RichText(
+          text: TextSpan(
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: isTablet ? 20 : 18,
+              fontSize: 22,
+              color: textColor,
             ),
+            children: [
+              TextSpan(text: "STEM"),
+              TextSpan(text: "X", style: TextStyle(fontSize: 30)),
+              TextSpan(text: "plore "),
+            ],
           ),
         ),
-        SizedBox(
-          height: 145,
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (notification is ScrollStartNotification) {
-                _autoScrollTimer?.cancel();
-              } else if (notification is ScrollEndNotification) {
-                _startAutoScroll();
-              }
-              setState(() {});
-              return true;
-            },
-            child: ListView.separated(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              physics: const BouncingScrollPhysics(),
-              itemCount: highlights.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 20),
-              itemBuilder: (context, index) {
-                return AnimatedBuilder(
-                  animation: _scrollController,
-                  builder: (context, child) {
-                    double cardPosition = 0.0;
-                    if (_scrollController.hasClients) {
-                      cardPosition =
-                          (index * _stepSize) - _scrollController.offset;
-                    }
-                    double rotation = cardPosition / 1000;
-                    return Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.001)
-                        ..rotateY(rotation),
-                      child: child,
-                    );
-                  },
-                  child: _buildHighlightCard(
-                    context,
-                    highlights[index],
-                    isEnglish,
-                  ),
-                );
-              },
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: const BoxDecoration(
+            color: Color(0xFFF2C458),
+            shape: BoxShape.circle,
+          ),
+          child: RichText(
+            text: const TextSpan(
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontSize: 16,
+              ),
+              children: [
+                TextSpan(text: "F", style: TextStyle(fontSize: 22)),
+                TextSpan(text: "2", style: TextStyle(fontSize: 30)),
+              ],
             ),
           ),
         ),
@@ -218,53 +216,58 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTopBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    color: Colors.black,
-                  ),
-                  children: [
-                    TextSpan(text: "STEM"),
-                    TextSpan(text: "X", style: TextStyle(fontSize: 30)),
-                    TextSpan(text: "plore "),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF2C458),
-                  shape: BoxShape.circle,
-                ),
-                child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
-                    children: [
-                      TextSpan(text: "F", style: TextStyle(fontSize: 22)),
-                      TextSpan(text: "2", style: TextStyle(fontSize: 30)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+  Widget _buildHighlightsSection(
+    bool isEnglish,
+    bool isTablet,
+    Color textColor,
+    bool isDark,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, top: 6.0, bottom: 4.0),
+          child: Text(
+            translate('highlights', isEnglish),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: isTablet ? 20 : 18,
+              color: textColor,
+            ),
           ),
-          LanguageToggle(onLanguageChanged: () => setState(() {})),
-        ],
-      ),
+        ),
+        Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isTablet ? 550 : double.infinity,
+            ),
+            child: SizedBox(
+              height: 190,
+              child: ListView.separated(
+                clipBehavior: Clip.hardEdge,
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20, //the space first card
+                  vertical: 10,
+                ),
+
+                itemCount: highlights.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 15),
+                itemBuilder: (context, index) => _buildHighlightCard(
+                  context,
+                  highlights[index],
+                  isEnglish,
+                  isDark,
+                  isTablet,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -272,23 +275,21 @@ class _HomePageState extends State<HomePage> {
     BuildContext context,
     Highlight h,
     bool isEnglish,
+    bool isDark,
+    bool isTablet,
   ) {
     return GestureDetector(
       onTap: () => widget.onHighlightTap(h),
       child: Container(
-        width: 280,
+        width: isTablet ? 320 : 280,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF3D3D3D) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: isDark ? [] : appBoxShadow,
+          border: isDark ? Border.all(color: Colors.white10) : null,
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.horizontal(
@@ -296,32 +297,34 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Image.asset(
                 h.image,
-                width: 100,
+                width: 105,
                 height: double.infinity,
                 fit: BoxFit.cover,
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isEnglish ? h.title : h.titleMs,
-                      style: const TextStyle(
+                      isEnglish ? h.titleEn : h.titleMs,
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 15,
+                        height: 1.2,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
-                      maxLines: 1,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 4),
                     Text(
-                      isEnglish ? h.subtitle : h.subtitleMs,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 11,
+                      isEnglish ? h.subtitleEn : h.subtitleMs,
+                      style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.black54,
+                        fontSize: 13,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -331,10 +334,10 @@ class _HomePageState extends State<HomePage> {
                       alignment: Alignment.bottomRight,
                       child: Text(
                         translate('readMore', isEnglish),
-                        style: const TextStyle(
-                          color: Colors.red,
+                        style: TextStyle(
+                          color: isDark ? Colors.red : Colors.red,
                           fontWeight: FontWeight.bold,
-                          fontSize: 11,
+                          fontSize: 13,
                         ),
                       ),
                     ),

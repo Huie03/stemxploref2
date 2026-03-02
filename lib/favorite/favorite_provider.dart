@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // Required for jsonEncode and jsonDecode
+import 'dart:convert';
 
 class FavoriteProvider with ChangeNotifier {
   List<Map<String, String>> _favorites = [];
@@ -8,24 +8,20 @@ class FavoriteProvider with ChangeNotifier {
   List<Map<String, String>> get bookmarks => _favorites;
 
   FavoriteProvider() {
-    _loadFavorites(); // Load saved data as soon as the app starts
+    _loadFavorites();
   }
 
-  // Save to local storage
   Future<void> _saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    // Convert the List of Maps into a JSON string
     String encodedData = jsonEncode(_favorites);
     await prefs.setString('user_favorites', encodedData);
   }
 
-  // Load from local storage
   Future<void> _loadFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     String? savedData = prefs.getString('user_favorites');
 
     if (savedData != null) {
-      // Decode the JSON string back into a List of Maps
       List<dynamic> decodedData = jsonDecode(savedData);
       _favorites = decodedData
           .map((item) => Map<String, String>.from(item))
@@ -38,7 +34,7 @@ class FavoriteProvider with ChangeNotifier {
     final index = _favorites.indexWhere(
       (m) =>
           m['title'] == material['title'] &&
-          m['chapter'] == material['chapter'],
+          m['chapter_num'] == material['chapter_num'],
     );
 
     if (index >= 0) {
@@ -47,13 +43,13 @@ class FavoriteProvider with ChangeNotifier {
       _favorites.add(material);
     }
 
-    _saveToPrefs(); // Save changes to the phone's memory
+    _saveToPrefs();
     notifyListeners();
   }
 
-  bool isFavorited(String title, String chapter) {
+  bool isFavorited(String title, String chapterNum) {
     return _favorites.any(
-      (m) => m['title'] == title && m['chapter'] == chapter,
+      (m) => m['title'] == title && m['chapter_num'] == chapterNum,
     );
   }
 }
