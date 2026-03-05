@@ -283,7 +283,7 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         width: isTablet ? 320 : 280,
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF3D3D3D) : Colors.white,
+          color: isDark ? const Color(0xFF535252) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: isDark ? [] : appBoxShadow,
           border: isDark ? Border.all(color: Colors.white10) : null,

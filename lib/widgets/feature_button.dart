@@ -21,7 +21,7 @@ class FeatureButton extends StatelessWidget {
     final bool isDark = themeProvider.isDarkMode;
 
     final Color buttonColor = isDark
-        ? const Color(0xFF3D3D3D)
+        ? const Color(0xCFF9C178)
         : const Color(0xFFF2C458);
     final Color textColor = Theme.of(context).colorScheme.onSurface;
 

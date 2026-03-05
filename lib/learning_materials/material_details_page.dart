@@ -176,7 +176,11 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
             icon: Icon(
               isBookmarked ? Icons.bookmark : Icons.bookmark_border,
               size: 30,
-              color: isBookmarked ? const Color(0xFFEFA638) : textColor,
+              color: isBookmarked
+                  ? (isDark
+                        ? const Color(0xFFEFA638)
+                        : Colors.black) //Fill icon
+                  : (isDark ? Colors.white : Colors.white), //Outline icon
             ),
           ),
         ],

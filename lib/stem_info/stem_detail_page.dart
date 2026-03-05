@@ -59,6 +59,7 @@ class _StemDetailPageState extends State<StemDetailPage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
+    final bool isSoundEnabled = themeProvider.isSoundEnabled;
 
     final String lang =
         FlutterLocalization.instance.currentLocale?.languageCode ?? 'en';
@@ -73,6 +74,13 @@ class _StemDetailPageState extends State<StemDetailPage> {
     final String appBarTitle = isEnglish ? 'STEM Info' : 'Maklumat STEM';
 
     bool isVideo = item['type'] == 'video';
+    if (_controller != null) {
+      if (isSoundEnabled) {
+        _controller!.unMute();
+      } else {
+        _controller!.mute();
+      }
+    }
 
     if (isVideo && _controller != null) {
       return YoutubePlayerBuilder(
@@ -171,7 +179,7 @@ class _StemDetailPageState extends State<StemDetailPage> {
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: cardBg,
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isDark ? Colors.white10 : Colors.black26,
                           ),

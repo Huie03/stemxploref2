@@ -153,7 +153,7 @@ class _StemInfoPageState extends State<StemInfoPage> {
                             decoration: BoxDecoration(
                               color: cardBg,
                               boxShadow: isDark ? [] : appBoxShadow,
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(20),
                               border: isDark
                                   ? Border.all(
                                       color: Colors.white10,

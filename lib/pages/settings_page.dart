@@ -16,6 +16,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final FlutterLocalization localization = FlutterLocalization.instance;
+  bool _isSoundOn = true;
 
   @override
   void initState() {
@@ -29,10 +30,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
-
     final bool isEnglish = localization.currentLocale?.languageCode == 'en';
-    final String title = isEnglish ? 'Settings' : 'Tetapan';
 
+    final String title = isEnglish ? 'Settings' : 'Tetapan';
     final Color cardBg = Theme.of(context).colorScheme.surface;
     final Color textColor = Theme.of(context).colorScheme.onSurface;
 
@@ -44,45 +44,90 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               _buildCustomAppBar(title, isEnglish, textColor),
               const SizedBox(height: 20),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: appBoxShadow,
+
+              // --- THEME CARD ---
+              _buildSettingsCard(
+                cardBg: cardBg,
+                icon: isDark ? Icons.dark_mode : Icons.light_mode,
+                iconColor: isDark ? const Color(0xFFFFAB40) : Colors.black,
+                title: isEnglish ? "Theme Mode" : "Mod Tema",
+                subtitle: isEnglish
+                    ? (isDark ? "Dark Mode" : "Light Mode")
+                    : (isDark ? "Mod Gelap" : "Mod Terang"),
+                textColor: textColor,
+                isDark: isDark,
+                trailing: Switch(
+                  value: isDark,
+                  activeColor: Colors.orange,
+                  onChanged: (value) => themeProvider.toggleTheme(),
                 ),
-                child: ListTile(
-                  leading: Icon(
-                    isDark ? Icons.dark_mode : Icons.light_mode,
-                    color: isDark ? Colors.orangeAccent : Colors.black,
-                  ),
-                  title: Text(
-                    isEnglish ? "Theme Mode" : "Mod Tema",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
-                  ),
-                  subtitle: Text(
-                    isEnglish
-                        ? (isDark ? "Dark Mode" : "Light Mode")
-                        : (isDark ? "Mod Gelap" : "Mod Terang"),
-                    style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
-                    ),
-                  ),
-                  trailing: Switch(
-                    value: isDark,
-                    activeColor: Colors.orange,
-                    onChanged: (value) {
-                      themeProvider.toggleTheme();
-                    },
-                  ),
+              ),
+
+              const SizedBox(height: 20), // Spacing between cards
+              // --- SOUND CARD ---
+              _buildSettingsCard(
+                cardBg: cardBg,
+                // 1. Icon automatically follows the Provider (Default: volume_up)
+                icon: themeProvider.isSoundEnabled
+                    ? Icons.volume_up
+                    : Icons.volume_off,
+                iconColor: themeProvider.isSoundEnabled
+                    ? Colors.orangeAccent
+                    : Colors.grey,
+                title: isEnglish ? "Sound" : "Suara",
+
+                // 2. Text automatically follows the Provider (Default: On / Buka)
+                subtitle: isEnglish
+                    ? (themeProvider.isSoundEnabled ? "On" : "Off")
+                    : (themeProvider.isSoundEnabled ? "Buka" : "Tutup"),
+
+                textColor: textColor,
+                isDark: isDark,
+                trailing: Switch(
+                  //Switch starts 'ON' because isSoundEnabled is true
+                  value: themeProvider.isSoundEnabled,
+                  activeColor: Colors.orange,
+                  onChanged: (value) {
+                    themeProvider.toggleSound(value);
+                  },
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Refactored Helper Method to keep the UI clean
+  Widget _buildSettingsCard({
+    required Color cardBg,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required Color textColor,
+    required bool isDark,
+    required Widget trailing,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: appBoxShadow,
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: iconColor),
+        title: Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+        ),
+        trailing: trailing,
       ),
     );
   }

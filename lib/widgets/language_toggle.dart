@@ -44,8 +44,8 @@ class LanguageToggle extends StatelessWidget {
             child: Image.asset(
               key: ValueKey<String>(isEnglish ? 'en' : 'ms'),
               isEnglish
-                  ? 'assets/flag/language us_flag.png'
-                  : 'assets/flag/language ms_flag.png',
+                  ? 'assets/flag/language ms_flag.png'
+                  : 'assets/flag/language us_flag.png',
               width: 36,
               height: 36,
               fit: BoxFit.cover,

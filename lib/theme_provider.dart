@@ -8,9 +8,17 @@ class ThemeProvider with ChangeNotifier {
   ThemeMode get themeMode => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
   ThemeData get currentTheme => _isDarkMode ? darkTheme : lightTheme;
 
+  bool _isSoundEnabled = true;
+  bool get isSoundEnabled => _isSoundEnabled;
+
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
     notifyListeners(); //Tells the whole app to rebuild
+  }
+
+  void toggleSound(bool value) {
+    _isSoundEnabled = value;
+    notifyListeners();
   }
 
   //Light Theme
@@ -39,7 +47,7 @@ class ThemeProvider with ChangeNotifier {
       seedColor: const Color(0xFFEFA638),
       brightness: Brightness.dark,
       primary: const Color(0xFFEFA638), //
-      surface: const Color(0xFF3D3D3D), // dark card color
+      surface: const Color(0xFF535252), // dark card color
       onSurface: Colors.white, // Default text color on surface
     ),
 

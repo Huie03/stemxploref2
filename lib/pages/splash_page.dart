@@ -26,7 +26,7 @@ class SplashPage extends StatelessWidget {
                 ),
               );
             },
-            child: const Center(child: Logo()),
+            child: const Logo(),
           ),
         ),
       ),
@@ -55,7 +55,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
 
     _pulseAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.1,
+      end: 1.08,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _controller.repeat(reverse: true);
@@ -73,54 +73,60 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
 
     return Stack(
       children: [
+        // 1. BRANDING GROUP (Logo + Text)
         Center(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: 60,
+            ), // Adjust this value to move it higher
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ScaleTransition(
+                  scale: _pulseAnimation,
+                  child: Image.asset(
+                    assetPath,
+                    width: 350,
+                    height: 350,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Transform.translate(
+                  offset: const Offset(0, -30),
+                  child: Text(
+                    'Inspiring young minds through STEM exploration',
+                    style: GoogleFonts.alice(
+                      textStyle: const TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // 2. INTERACTION GROUP (Icon + "Touch to start")
+        Positioned(
+          bottom: 50, // Pinned to bottom
+          left: 0,
+          right: 0,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ScaleTransition(
                 scale: _pulseAnimation,
-                child: Image.asset(
-                  assetPath,
-                  width: 330,
-                  height: 330,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0, -28),
-                child: Text(
-                  'Inspiring young minds through STEM exploration',
-                  style: GoogleFonts.alice(
-                    textStyle: const TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 20,
-          child: Column(
-            children: [
-              ScaleTransition(
-                scale: Tween<double>(begin: 0.9, end: 1.2).animate(
-                  CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-                ),
                 child: const Icon(
                   Icons.touch_app,
-                  size: 40,
-                  color: Color.fromARGB(255, 255, 166, 0),
+                  size: 35,
+                  color: Color(0xFFFFA600),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 'Touch to start',
                 style: GoogleFonts.alice(

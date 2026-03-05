@@ -18,7 +18,10 @@ class GradientBackground extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: isDark
-              ? [const Color(0xFF121212), const Color(0xFF121212)]
+              ? [
+                  const Color.fromARGB(0, 18, 18, 18),
+                  const Color.fromARGB(0, 18, 18, 18),
+                ]
               : [const Color(0xFFEFA638), const Color(0xFFFFFFFF)],
         ),
       ),

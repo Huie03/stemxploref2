@@ -213,22 +213,25 @@ class _QuizGamePageState extends State<QuizGamePage> {
               child: Column(
                 children: [
                   _buildModeButton(
-                    isEnglish ? "EASY MODE" : "MOD MUDAH",
-                    const Color(0xFF2ECC71), //Soft Green
-                    rawTitle,
-                    isDark,
+                    label: isEnglish ? "EASY MODE" : "MOD MUDAH",
+                    dbValue: "Easy",
+                    color: const Color(0xFF2ECC71),
+                    subject: rawTitle,
+                    isDark: isDark,
                   ),
                   _buildModeButton(
-                    isEnglish ? "MEDIUM MODE" : "MOD SEDERHANA",
-                    const Color(0xFFF1C40F), //Warm Yellow
-                    rawTitle,
-                    isDark,
+                    label: isEnglish ? "MEDIUM MODE" : "MOD SEDERHANA",
+                    dbValue: "Medium",
+                    color: const Color(0xFFF1C40F),
+                    subject: rawTitle,
+                    isDark: isDark,
                   ),
                   _buildModeButton(
-                    isEnglish ? "HARD MODE" : "MOD SUKAR",
-                    const Color(0xFFE74C3C), //Soft Red
-                    rawTitle,
-                    isDark,
+                    label: isEnglish ? "HARD MODE" : "MOD SUKAR",
+                    dbValue: "Hard",
+                    color: const Color(0xFFE74C3C),
+                    subject: rawTitle,
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -240,12 +243,13 @@ class _QuizGamePageState extends State<QuizGamePage> {
     );
   }
 
-  Widget _buildModeButton(
-    String label,
-    Color color,
-    String subject,
-    bool isDark,
-  ) {
+  Widget _buildModeButton({
+    required String label,
+    required String dbValue,
+    required Color color,
+    required String subject,
+    required bool isDark,
+  }) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 12),
@@ -254,14 +258,14 @@ class _QuizGamePageState extends State<QuizGamePage> {
           backgroundColor: color,
           foregroundColor: Colors.black,
           elevation: isDark ? 0 : 4,
-          shadowColor: Colors.black.withValues(alpha: 0.5),
+          shadowColor: Colors.black.withOpacity(0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),
         onPressed: () {
-          widget.selected("$subject|$label");
+          widget.selected("$subject|$dbValue");
         },
         child: Text(
           label,

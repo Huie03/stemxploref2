@@ -18,12 +18,12 @@ class AppCurvedNavBar extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
 
-    final Color iconColor = isDark ? Colors.white : Colors.black;
+    final Color iconColor = isDark ? Colors.black : Colors.black;
     final Color navBarColor = isDark
-        ? const Color(0xFF3D3D3D)
+        ? const Color(0xCFF9C178)
         : const Color(0xFFF2C458);
     final Color backgroundColor = isDark
-        ? const Color(0xFF121212)
+        ? const Color.fromARGB(0, 18, 18, 18)
         : Colors.white;
 
     return CurvedNavigationBar(

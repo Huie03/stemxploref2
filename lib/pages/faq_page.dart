@@ -105,7 +105,7 @@ class FaqItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color questionBg = isDark ? const Color(0xFF3D3D3D) : Colors.white;
     final Color answerBg = isDark
-        ? const Color.fromARGB(255, 39, 39, 39)
+        ? const Color.fromARGB(255, 111, 111, 111)
         : const Color(0xFFFFD266);
     final Color questionTextColor = isDark ? Colors.white : Colors.black;
     final Color answerTextColor = Theme.of(context).colorScheme.onSurface;
@@ -122,7 +122,7 @@ class FaqItem extends StatelessWidget {
                 color: questionBg,
                 boxShadow: isDark ? [] : appBoxShadow,
                 border: isDark ? Border.all(color: Colors.white10) : null,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(15),
               ),
               child: Row(
                 children: [
@@ -155,7 +155,7 @@ class FaqItem extends StatelessWidget {
                 color: answerBg,
                 boxShadow: isDark ? [] : appBoxShadow,
                 border: isDark ? Border.all(color: Colors.white10) : null,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(15),
               ),
               child: Text(
                 answer,

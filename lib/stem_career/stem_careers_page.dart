@@ -570,7 +570,7 @@ class _StemCareersPageState extends State<StemCareersPage> {
               value: progress,
               minHeight: 8,
               backgroundColor: isDark ? Colors.white10 : Colors.grey.shade300,
-              color: isDark ? const Color(0xFFEFA638) : Colors.green,
+              color: isDark ? const Color(0xFF50A915) : Colors.green,
             ),
           ),
           const SizedBox(height: 12),
@@ -681,7 +681,7 @@ class _StemCareersPageState extends State<StemCareersPage> {
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               size: 20,
               color: isSelected
-                  ? (isDark ? darkAccent : lightAccent)
+                  ? (isDark ? const Color(0xFFF19100) : const Color(0xFFF19100))
                   : (isDark ? darkUnselected : lightUnselected),
             ),
             const SizedBox(width: 12),
@@ -691,7 +691,9 @@ class _StemCareersPageState extends State<StemCareersPage> {
                 style: TextStyle(
                   fontSize: 15,
                   color: isSelected
-                      ? (isDark ? darkAccent : lightAccent)
+                      ? (isDark
+                            ? const Color(0xFFF19100)
+                            : const Color(0xFFF19100))
                       : (isDark ? darkText : lightText),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 ),
