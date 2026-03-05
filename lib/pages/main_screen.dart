@@ -48,7 +48,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void onQuizSubjectSelected(String subjectAndMode) {
-    setState(() => selectedQuizData = subjectAndMode);
+    setState(() {
+      selectedQuizData = subjectAndMode;
+    });
     Provider.of<NavigationProvider>(context, listen: false).setIndex(14);
   }
 
@@ -81,6 +83,9 @@ class _MainScreenState extends State<MainScreen> {
         onBackOverride: () => navProvider.setIndex(0),
       ), // 5
       QuizGamePage(
+        key: navProvider.currentIndex == 6
+            ? const ValueKey('quiz_menu')
+            : UniqueKey(),
         selected: onQuizSubjectSelected,
         onBackOverride: () => navProvider.setIndex(0),
       ), // 6
@@ -109,13 +114,20 @@ class _MainScreenState extends State<MainScreen> {
       selectedChapterData != null
           ? MaterialDetailPage(chapterData: selectedChapterData!)
           : const SizedBox.shrink(), // 13
-
+      // Inside MainScreen pages list
       selectedQuizData != null
           ? PlayQuizPage(
+              // IMPORTANT: The key MUST be here.
+              // When selectedQuizData changes from "ASK|Easy" to "Science|Easy",
+              // Flutter sees the key is different and runs initState() again.
+              key: ValueKey(selectedQuizData),
               subjectAndMode: selectedQuizData!,
-              onFinish: () => navProvider.setIndex(6),
+              onFinish: () {
+                setState(() => selectedQuizData = null);
+                navProvider.setIndex(6);
+              },
             )
-          : const SizedBox.shrink(), // 14
+          : const SizedBox.shrink(), // Index 14
     ];
 
     return PopScope(
@@ -124,6 +136,7 @@ class _MainScreenState extends State<MainScreen> {
         if (didPop) return;
 
         if (navProvider.currentIndex == 14) {
+          setState(() => selectedQuizData = null);
           navProvider.setIndex(6); // Back to Quiz List from the Game
         } else if (navProvider.currentIndex == 13) {
           navProvider.setIndex(12); // Back to Chapters from Detail
@@ -140,7 +153,16 @@ class _MainScreenState extends State<MainScreen> {
         extendBody: true,
         bottomNavigationBar: AppCurvedNavBar(
           currentIndex: activeNavIconIndex,
-          onTap: (index) => navProvider.setIndex(index),
+          onTap: (index) {
+            // RESTART LOGIC: If user clicks Home (0), Bookmark (1), etc.
+            // we clear the quiz data so it's fresh for next time.
+            if (selectedQuizData != null) {
+              setState(() {
+                selectedQuizData = null;
+              });
+            }
+            navProvider.setIndex(index);
+          },
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(

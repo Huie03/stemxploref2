@@ -62,8 +62,10 @@ class _QuizGamePageState extends State<QuizGamePage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
 
-    final Color textColor = Theme.of(context).colorScheme.onSurface;
-    final Color cardBg = Theme.of(context).colorScheme.surface;
+    final Color textColor = isDark ? Colors.black87 : Colors.black87;
+
+    // FORCE WHITE BACKGROUND FOR CARDS
+    final Color cardBg = Colors.white;
 
     final FlutterLocalization localization = FlutterLocalization.instance;
     final bool isEnglish =
@@ -78,7 +80,11 @@ class _QuizGamePageState extends State<QuizGamePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCustomAppBar(pageTitle, textColor),
+              // Use white text for the App Bar if the background is dark
+              _buildCustomAppBar(
+                pageTitle,
+                isDark ? Colors.white : Colors.black,
+              ),
               const SizedBox(height: 10),
               Expanded(
                 child: ListView.builder(
@@ -92,7 +98,7 @@ class _QuizGamePageState extends State<QuizGamePage> {
                     return _buildExpandableMaterialCard(
                       context,
                       isDark: isDark,
-                      cardBg: cardBg,
+                      cardBg: cardBg, // Now passed as Colors.white
                       textColor: textColor,
                       title: _translateTitle(rawTitle, isEnglish),
                       rawTitle: rawTitle,
